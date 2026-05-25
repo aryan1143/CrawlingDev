@@ -1,11 +1,24 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import pool from "./config/db.js";
+import createSchema from "./config/dbSchema.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3100;
+
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error("Error connecting to the database:", err.stack);
+  } else {
+    console.log("Successfully securely connected to PostgreSQL!");
+    release(); // Release the client back to the pool
+  }
+});
+
+createSchema();
 
 app.use(cors());
 app.use(express.json());
