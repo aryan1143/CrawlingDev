@@ -3,16 +3,28 @@ import pool from "./db.js";
 const createSchema = async () => {
   const schemaQuery = `
     CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        bio TEXT,
-        skills TEXT[] DEFAULT '{}',
-        followers INTEGER[] DEFAULT '{}',
-        reputation INTEGER DEFAULT 0,
-        badges TEXT[] DEFAULT '{}',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      username VARCHAR(255) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      bio TEXT,
+    
+      profile_pic TEXT DEFAULT 'https://res.cloudinary.com/dujfvcxjl/image/upload/v1776753314/defaultpfp.png',
+
+      skills TEXT[] DEFAULT ARRAY[]::TEXT[],
+    
+      reputation INTEGER DEFAULT 0,
+    
+      badges TEXT[] DEFAULT ARRAY[]::TEXT[],
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE followers (
+      follower_id INTEGER REFERENCES users(id),
+      following_id INTEGER REFERENCES users(id),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (follower_id, following_id)
     );
 
     CREATE TABLE IF NOT EXISTS projects (
