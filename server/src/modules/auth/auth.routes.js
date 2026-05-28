@@ -6,6 +6,7 @@ import {
   refreshAccessToken,
   register,
 } from "./auth.controller.js";
+import { requireAuth } from "../../shared/jwt.js";
 
 /**
  * auth routes handeling
@@ -14,8 +15,8 @@ const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.post("/logout", logout);
-router.post("/refresh", refreshAccessToken);
-router.get("/me", getCurrentUser);
+router.get("/refresh", refreshAccessToken);
+router.post("/logout", requireAuth, logout);
+router.get("/me", requireAuth, getCurrentUser);
 
 export default router;

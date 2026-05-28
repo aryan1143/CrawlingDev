@@ -38,14 +38,21 @@ export function signRefreshToken(id) {
  * @returns Resolves when middleware completes (calls next or sends a response).
  */
 export const requireAuth = async (req, res, next) => {
-  const accessToken = req.cookies?.accessToken; // life - 15 mins
+  const authHeader = req.headers.authorization || req.headers.Authorization;
 
-  if (!accessToken) {
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized. No token provided." });
+  }
+
+  const accessToken = authHeader.split(" ")[1];
+  const refreshToken = req.cookie?.refreshToken;
+  if (!accessToken || !refreshToken) {
     return res.status(401).json({ error: "Authentication required" });
   }
 
   try {
     const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
     req.user = { id: decoded.id };
     return next();
   } catch (error) {
