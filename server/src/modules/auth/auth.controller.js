@@ -8,32 +8,40 @@ import { signAccessToken, signRefreshToken } from "../../shared/jwt.js";
  *
  * @param req - Express request object.
  * @param res - Express response object.
- * @returns {void}
  */
 export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, username, password } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !username || !password) {
     return res
       .status(400)
-      .json({ error: "Name, email and password are required." });
+      .json({ error: "Name, username and password are required." });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({
+      error: "Password must be at least 6 characters.",
+    });
   }
 
   try {
-    //query to check if the user with the email already exist
-    const isAlreadyExistQuery = `SELECT * FROM users WHERE email = $1`;
+    const normalizedUsername = username.toLowerCase().trim();
+    //query to check if the user with the username already exist
+    const isAlreadyExistQuery = `SELECT * FROM users WHERE username = $1`;
 
-    const isAlreadyExistResult = await pool.query(isAlreadyExistQuery, [email]);
+    const isAlreadyExistResult = await pool.query(isAlreadyExistQuery, [
+      normalizedUsername,
+    ]);
 
     if (isAlreadyExistResult.rowCount !== 0) {
       return res
         .status(400)
-        .json({ error: "User with this email already exist" });
+        .json({ error: "User with this username already exist" });
     }
 
     //query to create user in the database
     const query = `
-    INSERT INTO users (name, email, password) 
+    INSERT INTO users (name, username, password) 
     VALUES ($1, $2, $3) 
     RETURNING id, name, username, bio, skills, followers, reputation, badges, created_at;
     `;
@@ -41,7 +49,11 @@ export const register = async (req, res) => {
     //hashing the password using bcrypt
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const result = await pool.query(query, [name, email, hashedPassword]);
+    const result = await pool.query(query, [
+      name,
+      normalizedUsername,
+      hashedPassword,
+    ]);
 
     if (result.rowCount === 0) {
       return res.status(400).json({ error: "Failed to register user" });
@@ -56,18 +68,18 @@ export const register = async (req, res) => {
     res.cookie("accessToken", accessToken, {
       maxAge: 15 * 60 * 1000, // expires in 15 mins (in milliseconds)
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     });
 
     res.cookie("refreshToken", refreshToken, {
       maxAge: 7 * 24 * 60 * 60 * 1000, // expires in 7 days (in milliseconds)
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     });
 
-    res.status(201).json({ user, message: "User registerd succesfully." });
+    res.status(201).json({ user, message: "User registered successfully." });
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });
     console.log("Error in register controller: ", error);
@@ -79,25 +91,78 @@ export const register = async (req, res) => {
  *
  * @param req - Express request object.
  * @param res - Express response object.
- * @returns {void}
  */
-export const login = (req, res) => {
-  res.status(501).json({
-    message: "Login handler not implemented yet.",
-  });
+export const login = async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res
+      .status(400)
+      .json({ error: "Username and password are required." });
+  }
+
+  try {
+    const normalizedUsername = username.toLowerCase().trim();
+    //query to check if the user with the username exist
+    const query = `
+      SELECT id, name, username, password, bio, skills,
+      followers, reputation, badges, created_at
+      FROM users
+      WHERE username = $1
+      `;
+
+    const result = await pool.query(query, [normalizedUsername]);
+
+    if (result.rowCount === 0) {
+      return res.status(400).json({ error: "Invalid username or password." });
+    }
+
+    const user = result.rows[0];
+
+    const isValid = await bcrypt.compare(password, user.password);
+
+    if (!isValid)
+      return res.status(400).json({ error: "Invalid username or password." });
+
+    const accessToken = signAccessToken(user.id);
+    const refreshToken = signRefreshToken(user.id);
+
+    //setting token to cookie
+    res.cookie("accessToken", accessToken, {
+      maxAge: 15 * 60 * 1000, // expires in 15 mins (in milliseconds)
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // expires in 7 days (in milliseconds)
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    res.status(200).json({ user, message: "User logged in successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error." });
+    console.log("Error in login controller: ", error);
+  }
 };
 
 /**
- * End the current user session.
+ * End the current user session (logout the user).
  *
  * @param req - Express request object.
  * @param res - Express response object.
- * @returns {void}
  */
 export const logout = (req, res) => {
-  res.status(501).json({
-    message: "Logout handler not implemented yet.",
-  });
+  try {
+    res.clearCookie("refreshToken");
+    res.status(200).json({ message: "Logged out successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error." });
+    console.log("Error in logout controller: ", error);
+  }
 };
 
 /**
@@ -105,13 +170,12 @@ export const logout = (req, res) => {
  *
  * @param req - Express request object.
  * @param res - Express response object.
- * @returns {void}
  */
-export const refreshAccessToken = (req, res) => {
+export const refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies?.refreshToken;
 
-  if(!refreshToken) {
-    return res.status(401).json({error: "Unauthorized! No token provided."});
+  if (!refreshToken) {
+    return res.status(401).json({ error: "Unauthorized! No token provided." });
   }
 
   try {
@@ -125,7 +189,7 @@ export const refreshAccessToken = (req, res) => {
     const userData = await pool.query(query, [decodedRefresh.id]);
 
     if (userData.rowCount === 0) {
-      return res.status(401).json({ error: "User no longer exists" });
+      return res.status(401).json({ error: "User no longer exist" });
     }
 
     const user = userData.rows[0];
@@ -135,17 +199,18 @@ export const refreshAccessToken = (req, res) => {
     res.cookie("accessToken", newAccessToken, {
       maxAge: 15 * 60 * 1000, // expires in 15 minutes (in milliseconds)
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     });
 
-    res.status(200).json({message: "Token refreshed successfully."});
-
+    res.status(200).json({
+      accessToken: newAccessToken,
+      message: "Token refreshed successfully.",
+    });
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });
-    console.log("Error in register controller: ", error);
+    console.log("Error in refresh-access-token controller: ", error);
   }
-
 };
 
 /**
@@ -153,10 +218,25 @@ export const refreshAccessToken = (req, res) => {
  *
  * @param req - Express request object.
  * @param res - Express response object.
- * @returns {void}
  */
-export const getCurrentUser = (req, res) => {
-  res.status(501).json({
-    message: "Current user handler not implemented yet.",
-  });
+export const getCurrentUser = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    //query to check if the user with the userId exist.
+    const query = `SELECT id, name, username, bio, skills, followers, reputation, badges, created_at FROM users WHERE id = $1`;
+
+    const result = await pool.query(query, [userId]);
+
+    if (result.rowCount === 0) {
+      return res.status(400).json({ error: "Invalid username or password." });
+    }
+
+    const user = result.rows[0];
+
+    res.status(200).json({ user, message: "User data fetched successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error." });
+    console.log("Error in get-current-user controller: ", error);
+  }
 };
