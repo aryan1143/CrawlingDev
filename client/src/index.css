@@ -1,1 +1,178 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap");
 @import "tailwindcss";
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent: var(--color-accent);
+  --color-background: var(--color-background);
+  --color-primary-content: var(--color-primary-content);
+  --color-secondary-content: var(--color-secondary-content);
+  --color-accent-content: var(--color-accent-content);
+  --color-card: var(--color-card);
+  --color-card-content: var(--color-card-content);
+
+  /* Link colors */
+  --color-link: var(--link-color);
+  --color-link-hover: var(--link-hover);
+  --color-link-visited: var(--link-visited);
+
+  /* Button colors */
+  --color-btn: var(--btn-bg);
+  --color-btn-text: var(--btn-text);
+  --color-btn-border: var(--btn-border);
+
+  --color-btn-primary: var(--btn-primary-bg);
+  --color-btn-primary-text: var(--btn-primary-text);
+  --color-btn-primary-hover: var(--btn-primary-hover);
+
+  --color-btn-secondary: var(--btn-secondary-bg);
+  --color-btn-secondary-text: var(--btn-secondary-text);
+  --color-btn-secondary-hover: var(--btn-secondary-hover);
+
+  --color-btn-accent: var(--btn-accent-bg);
+  --color-btn-accent-text: var(--btn-accent-text);
+  --color-btn-accent-hover: var(--btn-accent-hover);
+  /* Error colors */
+  --color-error: var(--color-error);
+  --color-error-text: var(--color-error-text);
+  --color-error-bg: var(--color-error-bg);
+  --color-error-hover: var(--color-error-hover);
+}
+
+@layer base {
+  :root {
+    --color-primary: #0a66c2;
+    --color-secondary: #56687a;
+    --color-accent: #e7a33e;
+    --color-background: #f3f2ef;
+    --color-card: #ffffff;
+
+    --color-primary-content: #ffffff;
+    --color-secondary-content: #ffffff;
+    --color-accent-content: #000000;
+    --color-card-content: #000000;
+
+    --page-bg-start: #e8f6ff;
+    --page-bg-mid: #ffffff;
+    --page-bg-end: #e6fffc;
+    /* Button tokens (default / primary / secondary / accent) */
+    --btn-bg: var(--color-primary);
+    --btn-text: var(--color-primary-content);
+    --btn-border: transparent;
+
+    --btn-primary-bg: var(--color-primary);
+    --btn-primary-text: var(--color-primary-content);
+    --btn-primary-hover: #0854a0;
+
+    --btn-secondary-bg: #f3f4f6;
+    --btn-secondary-text: #1e293b;
+    --btn-secondary-hover: #e6e9ee;
+
+    --btn-accent-bg: var(--color-accent);
+    --btn-accent-text: var(--color-accent-content);
+    --btn-accent-hover: #d9982e;
+    /* Link tokens */
+    --link-color: #0b61b6;
+    --link-hover: #084b8a;
+    --link-visited: #5a7aa0;
+
+    /* Error tokens (default) */
+    --color-error: #dc2626;
+    --color-error-text: #ffffff;
+    --color-error-bg: #fff1f2;
+    --color-error-hover: #b91c1c;
+  }
+
+  [data-theme="light"] {
+    --color-primary: #0a66c2;
+    --color-secondary: #56687a;
+    --color-accent: #e7a33e;
+    --color-background: #f3f2ef;
+    --color-card: #ffffff;
+
+    --color-primary-content: #ffffff;
+    --color-secondary-content: #ffffff;
+    --color-accent-content: #000000;
+    --color-card-content: #1e2a3a;
+
+    --page-bg-start: #dde8f0;
+    --page-bg-mid: #ffffff;
+    --page-bg-end: #e6f8ff;
+    --btn-primary-bg: #0a66c2;
+    --btn-primary-text: #ffffff;
+    --btn-primary-hover: #0854a0;
+
+    --btn-secondary-bg: #f3f4f6;
+    --btn-secondary-text: #1e293b;
+    --btn-secondary-hover: #e6e9ee;
+
+    --btn-accent-bg: #e7a33e;
+    --btn-accent-text: #000000;
+    --btn-accent-hover: #d9982e;
+    /* Link tokens (light) */
+    --link-color: #0b61b6;
+    --link-hover: #084b8a;
+    --link-visited: #5a7aa0;
+
+    /* Error tokens (light) */
+    --color-error: #dc2626;
+    --color-error-text: #ffffff;
+    --color-error-bg: #fff1f2;
+    --color-error-hover: #b91c1c;
+  }
+
+  [data-theme="dark"] {
+    --color-primary: #0a66c2;
+    --color-secondary: #707e8c;
+    --color-accent: #fce2ba;
+    --color-background: #1d2226;
+    --color-card: #202226;
+    --color-primary-content: #ffffff;
+    --color-secondary-content: #ffffff;
+    --color-accent-content: #1d2226;
+    --color-card-content: #ffffff;
+
+    --page-bg-start: #121417;
+    --page-bg-mid: #18191b;
+    --page-bg-end: #14141a;
+    --btn-primary-bg: #0a66c2;
+    --btn-primary-text: #ffffff;
+    --btn-primary-hover: #0a57a8;
+
+    --btn-secondary-bg: #27303a;
+    --btn-secondary-text: #ffffff;
+    --btn-secondary-hover: #2f3944;
+
+    --btn-accent-bg: #f6c67a;
+    --btn-accent-text: #0f1720;
+    --btn-accent-hover: #f3bf52;
+    /* Link tokens (dark) */
+    --link-color: #7fb6ff;
+    --link-hover: #a7d0ff;
+    --link-visited: #8aaed3;
+
+    /* Error tokens (dark) */
+    --color-error: #ff6b6b;
+    --color-error-text: #ffffff;
+    --color-error-bg: #3b0d0d;
+    --color-error-hover: #ff4b4b;
+  }
+}
+
+body {
+  font-family: "Source Sans 3", sans-serif;
+}
+
+.page {
+  background: radial-gradient(
+    circle,
+    var(--page-bg-start) 0%,
+    var(--page-bg-mid) 69%,
+    var(--page-bg-end) 100%
+  );
+}
+
+button {
+  cursor: pointer;
+}
