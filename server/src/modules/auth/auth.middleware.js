@@ -9,6 +9,6 @@ const loginLimiter = rateLimit({
   message: "Too many login attempts. Try again in 15 minutes.",
 });
 
-authMiddleware.use(loginLimiter);
+middleware.use(loginLimiter);
 
 export default middleware;
