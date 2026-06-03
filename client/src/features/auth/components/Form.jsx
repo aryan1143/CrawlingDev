@@ -1,4 +1,4 @@
-import { CircleX } from "lucide-react";
+import { CircleX, Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 
 export const FormCard = ({ children, className }) => {
@@ -39,6 +39,7 @@ export const Input = ({
   name,
 }) => {
   const [isValid, setIsValid] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validate = (e) => {
     if (validationRegex?.test(e.target.value.trim())) {
@@ -69,7 +70,7 @@ export const Input = ({
           {lableIcon}
         </span>
         <input
-          type={type || "text"}
+          type={type === "password" && showPassword ? "text" : type || "text"}
           id={id || "input"}
           placeholder={placeholder}
           className="focus:outline-0 py-1.5 lg:py-0 w-full"
@@ -81,6 +82,16 @@ export const Input = ({
           required
           value={value}
         />
+        {type === "password" && (
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="flex justify-center items-center text-card-content/60 hover:text-card-content"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
       </div>
     </div>
   );
