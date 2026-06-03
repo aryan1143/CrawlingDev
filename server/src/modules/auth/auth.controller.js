@@ -142,6 +142,8 @@ export const login = async (req, res) => {
       sameSite: "lax",
     });
 
+    delete user.password;
+
     res.status(200).json({ user, message: "User logged in successfully." });
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });

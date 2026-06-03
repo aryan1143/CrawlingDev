@@ -16,7 +16,7 @@ const createSchema = async () => {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE TABLE followers (
+    CREATE TABLE IF NOT EXISTS followers (
       follower_id INTEGER REFERENCES users(id),
       following_id INTEGER REFERENCES users(id),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -52,8 +52,6 @@ const createSchema = async () => {
     console.log("Tables created successfully!");
   } catch (error) {
     console.error("Error creating tables:", error.message);
-  } finally {
-    await pool.end();
   }
 };
 

@@ -45,7 +45,7 @@ export const requireAuth = async (req, res, next) => {
   }
 
   const accessToken = authHeader.split(" ")[1];
-  const refreshToken = req.cookie?.refreshToken;
+  const refreshToken = req.cookies?.refreshToken;
   if (!accessToken || !refreshToken) {
     return res.status(401).json({ error: "Authentication required" });
   }
@@ -65,6 +65,4 @@ export const requireAuth = async (req, res, next) => {
     console.log("Error in require-auth middleware: ", error);
   }
 
-  req.user = user;
-  next();
 };
