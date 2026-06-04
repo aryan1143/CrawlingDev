@@ -176,3 +176,8 @@ body {
 button {
   cursor: pointer;
 }
+
+a.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
