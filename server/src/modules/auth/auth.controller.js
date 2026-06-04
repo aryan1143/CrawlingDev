@@ -43,7 +43,7 @@ export const register = async (req, res) => {
     const query = `
     INSERT INTO users (name, username, password) 
     VALUES ($1, $2, $3) 
-    RETURNING id, name, username, bio, skills, followers, reputation, badges, created_at;
+    RETURNING id, name, username, bio, skills, reputation, badges, created_at;
     `;
 
     //hashing the password using bcrypt
@@ -226,7 +226,7 @@ export const getCurrentUser = async (req, res) => {
 
   try {
     //query to check if the user with the userId exist.
-    const query = `SELECT id, name, username, bio, skills, followers, reputation, badges, created_at FROM users WHERE id = $1`;
+    const query = `SELECT * FROM users WHERE id = $1`;
 
     const result = await pool.query(query, [userId]);
 
@@ -235,6 +235,7 @@ export const getCurrentUser = async (req, res) => {
     }
 
     const user = result.rows[0];
+    delete user.password;
 
     res.status(200).json({ user, message: "User data fetched successfully." });
   } catch (error) {
