@@ -45,4 +45,4 @@ const deleteFromCloudinary = async (imageUrl) => {
   }
 };
 
-module.exports = { upload, uploadToCloudinary, deleteFromCloudinary };
+export { upload, uploadToCloudinary, deleteFromCloudinary };
