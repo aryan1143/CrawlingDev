@@ -5,137 +5,96 @@ import {
 import pool from "../../config/db.js";
 
 /**
- * Handle updating the user's name.
+ * Handle updating the user's profile details in one request.
  *
  * @param req - Express request object.
  * @param res - Express response object.
  */
-export const updateName = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name } = req.body;
+    const { name, bio, skills, github, linkedin } = req.body;
 
-    if (!name) {
-      return res
-        .status(400)
-        .json({ error: "Name is required", success: false });
+    const updates = [];
+    const values = [];
+
+    if (name !== undefined) {
+      if (typeof name !== "string" || !name.trim()) {
+        return res.status(400).json({
+          error: "Name must be a non-empty string",
+          success: false,
+        });
+      }
+
+      values.push(name.trim());
+      updates.push(`name = $${values.length}`);
     }
 
-    const query = `UPDATE users SET name = $1 WHERE id = $2`;
+    if (bio !== undefined) {
+      if (typeof bio !== "string") {
+        return res
+          .status(400)
+          .json({ error: "Bio must be a string", success: false });
+      }
 
-    const result = await pool.query(query, [name, userId]);
-
-    if (result.rowCount === 0) {
-      return res
-        .status(404)
-        .json({ error: "User does not exist.", success: false });
+      values.push(bio);
+      updates.push(`bio = $${values.length}`);
     }
 
-    res
-      .status(200)
-      .json({ message: "User's name updated successfully.", success: true });
-  } catch (error) {
-    console.log("Error in updateName users-controller: ", error);
-    return res
-      .status(500)
-      .json({ error: "Internal server error.", success: false });
-  }
-};
+    if (skills !== undefined) {
+      if (
+        !Array.isArray(skills) ||
+        !skills.every((skill) => typeof skill === "string")
+      ) {
+        return res.status(400).json({
+          error: "Skills must be an array of strings",
+          success: false,
+        });
+      }
 
-/**
- * Handle updating the user's bio.
- *
- * @param req - Express request object.
- * @param res - Express response object.
- */
-export const updateBio = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { bio } = req.body;
-
-    if (!bio) {
-      return res.status(400).json({ error: "Bio is required", success: false });
+      values.push(skills);
+      updates.push(`skills = $${values.length}::text[]`);
     }
 
-    const query = `UPDATE users SET bio = $1 WHERE id = $2`;
+    if (github !== undefined) {
+      if (typeof github !== "string") {
+        return res
+          .status(400)
+          .json({ error: "Github link must be a string", success: false });
+      }
 
-    const result = await pool.query(query, [bio, userId]);
-
-    if (result.rowCount === 0) {
-      return res
-        .status(404)
-        .json({ error: "User does not exist.", success: false });
+      values.push(github);
+      updates.push(`github = $${values.length}`);
     }
 
-    res
-      .status(200)
-      .json({ message: "User's bio updated successfully.", success: true });
-  } catch (error) {
-    console.log("Error in updateBio controller: ", error);
-    return res
-      .status(500)
-      .json({ error: "Internal server error.", success: false });
-  }
-};
+    if (linkedin !== undefined) {
+      if (typeof linkedin !== "string") {
+        return res
+          .status(400)
+          .json({ error: "Linkedin link must be a string", success: false });
+      }
 
-/**
- * Handle updating the user's skills.
- *
- * @param req - Express request object.
- * @param res - Express response object.
- */
-export const updateSkills = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { skills } = req.body;
-
-    if (!skills) {
-      return res
-        .status(400)
-        .json({ error: "Skills are required", success: false });
+      values.push(github);
+      updates.push(`linkedin = $${values.length}`);
     }
 
-    const query = `UPDATE users SET skills = $1::text[] WHERE id = $2`;
-
-    const result = await pool.query(query, [skills, userId]);
-
-    if (result.rowCount === 0) {
-      return res
-        .status(404)
-        .json({ error: "User does not exist.", success: false });
+    if (updates.length === 0) {
+      return res.status(400).json({
+        error: "At least one profile field is required to update",
+        success: false,
+      });
     }
 
-    res
-      .status(200)
-      .json({ message: "User's skills updated successfully.", success: true });
-  } catch (error) {
-    console.log("Error in updateSkills controller: ", error);
-    return res
-      .status(500)
-      .json({ error: "Internal server error.", success: false });
-  }
-};
+    values.push(userId);
 
-/**
- * Handle updating the user's social links.
- *
- * @param req - Express request object.
- * @param res - Express response object.
- */
-export const updateSocialLinks = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { socialLinks } = req.body;
+    const query = `
+      UPDATE users
+      SET ${updates.join(", ")}
+      WHERE id = $${values.length}
+      RETURNING id, name, username, bio, profile_pic, skills, linkedin, github, reputation, badges, created_at
+    `;
 
-    if (!socialLinks) {
-      return res
-        .status(400)
-        .json({ error: "Social links are required", success: false });
-    }
-
-    const query = `UPDATE users SET social_links = $1::text[] WHERE id = $2`;
-
-    const result = await pool.query(query, [socialLinks, userId]);
+    const result = await pool.query(query, values);
 
     if (result.rowCount === 0) {
       return res
@@ -144,11 +103,12 @@ export const updateSocialLinks = async (req, res) => {
     }
 
     res.status(200).json({
-      message: "User's social links updated successfully.",
+      message: "User profile updated successfully.",
       success: true,
+      user: result.rows[0],
     });
   } catch (error) {
-    console.log("Error in updateSocialLinks controller: ", error);
+    console.log("Error in updateProfile controller: ", error);
     return res
       .status(500)
       .json({ error: "Internal server error.", success: false });
@@ -172,12 +132,10 @@ export const updateReputation = async (req, res) => {
       typeof reputation !== "number" ||
       Number.isNaN(reputation)
     ) {
-      return res
-        .status(400)
-        .json({
-          error: "Reputation is required and must be a number",
-          success: false,
-        });
+      return res.status(400).json({
+        error: "Reputation is required and must be a number",
+        success: false,
+      });
     }
 
     const query = `UPDATE users SET reputation = $1 WHERE id = $2`;
@@ -284,12 +242,10 @@ export const uploadProfilePic = async (req, res) => {
         .json({ error: "User not found to update profile pic." });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "User profile pic updated successfully.",
-        success: true,
-      });
+    res.status(200).json({
+      message: "User profile pic updated successfully.",
+      success: true,
+    });
 
     const user = result.rows[0];
 
