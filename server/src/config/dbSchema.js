@@ -10,7 +10,8 @@ const createSchema = async () => {
       bio TEXT,
       profile_pic TEXT DEFAULT 'https://res.cloudinary.com/dujfvcxjl/image/upload/v1776753314/defaultpfp.png',
       skills TEXT[] DEFAULT ARRAY[]::TEXT[],
-      social_links TEXT[] DEFAULT ARRAY[]::TEXT[],
+      github VARCHAR(100),
+      linkedin VARCHAR(100),
       reputation INTEGER DEFAULT 0,
       badges TEXT[] DEFAULT ARRAY[]::TEXT[],
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

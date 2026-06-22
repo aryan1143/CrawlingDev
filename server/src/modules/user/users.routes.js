@@ -1,11 +1,8 @@
 import { Router } from "express";
 import {
   updateBadge,
-  updateBio,
-  updateName,
+  updateProfile,
   updateReputation,
-  updateSkills,
-  updateSocialLinks,
   uploadProfilePic,
 } from "./users.controller.js";
 import { upload } from "../../config/cloudinary.js";
@@ -15,11 +12,10 @@ import { upload } from "../../config/cloudinary.js";
  */
 const router = Router();
 
-router.patch("/me/name", updateName);
-router.patch("/me/bio", updateBio);
-router.patch("/me/skills", updateSkills);
-router.patch("/me/social-links", updateSocialLinks);
+router.patch("/me", updateProfile);
+
 router.patch("/me/reputation", updateReputation);
+
 router.patch("/me/badge", updateBadge);
 
 router.put("/me/profile-pic", upload.single("image"), uploadProfilePic);
