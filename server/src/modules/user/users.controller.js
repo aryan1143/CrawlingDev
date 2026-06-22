@@ -232,17 +232,18 @@ export const uploadProfilePic = async (req, res) => {
       `profiles/${userId}`,
     );
 
-    const updateQuery = `UPDATE users SET profile_pic = $1 WHERE id = $2`;
+    const updateQuery = `UPDATE users SET profile_pic = $1 WHERE id = $2 RETURNING profile_pic`;
 
-    const updateResult = await pool.query(updateQuery, [newUrl, userId]);
+    const updatedResult = await pool.query(updateQuery, [newUrl, userId]);
 
-    if (updateResult.rowCount === 0) {
+    if (updatedResult.rowCount === 0) {
       return res
         .status(404)
         .json({ error: "User not found to update profile pic." });
     }
 
     res.status(200).json({
+      profile_pic: updatedResult.rows[0].profile_pic,
       message: "User profile pic updated successfully.",
       success: true,
     });
