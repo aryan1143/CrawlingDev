@@ -74,7 +74,7 @@ export const updateProfile = async (req, res) => {
           .json({ error: "Linkedin link must be a string", success: false });
       }
 
-      values.push(github);
+      values.push(linkedin);
       updates.push(`linkedin = $${values.length}`);
     }
 
