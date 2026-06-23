@@ -9,6 +9,7 @@ const createSchema = async () => {
       password VARCHAR(255) NOT NULL,
       bio TEXT,
       profile_pic TEXT DEFAULT 'https://res.cloudinary.com/dujfvcxjl/image/upload/v1776753314/defaultpfp.png',
+      banner TEXT DEFAULT 'default-banner',
       skills TEXT[] DEFAULT ARRAY[]::TEXT[],
       github VARCHAR(100),
       linkedin VARCHAR(100),

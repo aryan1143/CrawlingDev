@@ -91,7 +91,7 @@ export const updateProfile = async (req, res) => {
       UPDATE users
       SET ${updates.join(", ")}
       WHERE id = $${values.length}
-      RETURNING id, name, username, bio, profile_pic, skills, linkedin, github, reputation, badges, created_at
+      RETURNING id, name, username, bio, profile_pic, banner, skills, linkedin, github, reputation, badges, created_at
     `;
 
     const result = await pool.query(query, values);
@@ -265,6 +265,50 @@ export const uploadProfilePic = async (req, res) => {
     }
   } catch (error) {
     console.log("Error in  controller: ", error);
+    return res
+      .status(500)
+      .json({ error: "Internal server error.", success: false });
+  }
+};
+
+/**
+ * Handle uploading the user's banner picture.
+ *
+ * @param req - Express request object.
+ * @param res - Express response object.
+ */
+export const updateBanner = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { bannerId } = req.body;
+
+    if (!bannerId) {
+      return res
+        .status(400)
+        .json({ error: "Banner id id required", success: false });
+    }
+
+    if (typeof bannerId !== "string") {
+      return res
+        .status(400)
+        .json({ error: "Invalid type banner id", success: false });
+    }
+
+    const query = `UPDATE users SET banner = $1 WHERE id = $2`;
+
+    const result = await pool.query(query, [bannerId, userId]);
+
+    if (result.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ error: "User does not exist.", success: false });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User's banner updated successfully.", success: true });
+  } catch (error) {
+    console.log("Error in updateBanner controller: ", error);
     return res
       .status(500)
       .json({ error: "Internal server error.", success: false });
