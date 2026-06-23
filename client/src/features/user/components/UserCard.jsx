@@ -144,7 +144,9 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
       {(isDeletingAccount || isLoggingout) && (
         <div className="absolute top-1/2 left-1/2 -translate-1/2 w-full h-full bg-background z-25 flex flex-col gap-3 items-center justify-center">
           <HashLoader color="var(--color-card-content)" />
-          <span className="">Deleting Account...</span>
+          <span className="">
+            {isLoggingout ? "Logging out" : "Deleting Account..."}
+          </span>
         </div>
       )}
       <div className="relative w-full h-35 md:h-65">
