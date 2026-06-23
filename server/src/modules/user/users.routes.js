@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   updateBadge,
+  updateBanner,
   updateProfile,
   updateReputation,
   uploadProfilePic,
@@ -17,6 +18,8 @@ router.patch("/me", updateProfile);
 router.patch("/me/reputation", updateReputation);
 
 router.patch("/me/badge", updateBadge);
+
+router.patch("/me/banner", updateBanner);
 
 router.put("/me/profile-pic", upload.single("image"), uploadProfilePic);
 
