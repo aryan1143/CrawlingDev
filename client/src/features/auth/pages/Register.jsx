@@ -1,7 +1,7 @@
 import Page from "../../../shared/ui/Page";
 import { Button, FormCard, Input } from "../components/Form";
 import { User, AtSign, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRegisterUserMutation } from "../api/auth.api";
 import { useDispatch } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
@@ -42,11 +42,14 @@ const Register = () => {
     }
   }, [error, isError]);
 
+  const navigate = useNavigate();
+
   const handleSubmit = async () => {
     const res = await registerUser({ name, username, password }).unwrap();
     console.log(res);
     dispatch(setAccessToken(res.accessToken));
     dispatch(setUser(res.user));
+    if (!isError) navigate("/");
   };
 
   return (

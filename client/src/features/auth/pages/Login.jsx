@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Page from "../../../shared/ui/Page";
 import { Button, FormCard, Input } from "../components/Form";
 import { AtSign, Lock, LogIn } from "lucide-react";
@@ -40,10 +40,13 @@ const Login = () => {
     }
   }, [error, isError]);
 
+  const navigate = useNavigate();
+
   const handleSubmit = async () => {
     const res = await loginUser({ username, password }).unwrap();
     dispatch(setAccessToken(res.accessToken));
     dispatch(setUser(res.user));
+    if (!isError) navigate("/");
   };
 
   return (
