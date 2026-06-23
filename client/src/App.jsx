@@ -26,7 +26,7 @@ function App() {
   }, [data, dispatch, isSuccess]);
 
   return (
-    <div className="relative w-screen h-svh flex page flex-col">
+    <div className="relative w-screen h-svh flex page flex-col overflow-hidden">
       {pathname !== "/login" && pathname !== "/register" && <Navbar />}
       {isLoading ? (
         <div className="absolute top-1/2 left-1/2 -translate-1/2">
@@ -35,7 +35,7 @@ function App() {
       ) : (
         <AppRoutes />
       )}
-      {!isDesktop && (
+      {!isDesktop && pathname !== "/login" && pathname !== "/register" && (
         <div className="w-full">
           <NavLinks isMobile={true} />
         </div>

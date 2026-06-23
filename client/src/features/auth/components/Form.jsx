@@ -61,7 +61,6 @@ export const Input = ({
             <p>{validationMessage || "Invalid input"}</p>
           </span>
         )}
-        {}
       </label>
       <div
         className={`p-1 px-2 flex gap-1 bg-card-content/5 focus-within:outline-2 rounded-md shadow-xsm ${!isValid && "outline-1 outline-error"} ${className}`}

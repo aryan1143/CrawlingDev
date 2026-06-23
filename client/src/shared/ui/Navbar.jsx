@@ -6,10 +6,9 @@ import NavLinks from "./components/NavLinks";
 const Navbar = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const profilePic = useSelector((state) => state.auth?.user?.profile_pic);
-  console.log(profilePic);
   return (
     <div className="w-full h-15 mb-auto bg-card border-b border-gray-500/20 flex justify-center">
-      <div className="p-1 px-2 h-full w-full max-w-[calc(45vw+360px)] flex items-center gap-2">
+      <div className="p-1 px-2 h-full w-full max-w-[calc(50vw+360px)] flex items-center gap-2">
         <div className="flex shrink-0 gap-2 justify-center items-center h-full">
           {isDesktop && <img src="/icon-512.png" className="h-9/10" />}
           <h1 className="text-card-content font-bold text-2xl">CrawlingDev</h1>
@@ -25,8 +24,11 @@ const Navbar = () => {
             />
           )}
         </div>
-        <div className="h-8/10 shrink-0 aspect-square rounded-full overflow-hidden bg-gray-500">
-          <img src={profilePic} />
+        <div className="h-8/10 shrink-0 p-0.5 aspect-square rounded-full overflow-hidden bg-gray-500">
+          <img
+            src={profilePic}
+            className="object-cover rounded-full w-full h-full"
+          />
         </div>
       </div>
     </div>

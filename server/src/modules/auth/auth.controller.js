@@ -79,7 +79,12 @@ export const register = async (req, res) => {
       sameSite: "lax",
     });
 
-    res.status(201).json({ user, message: "User registered successfully." });
+    res.status(201).json({
+      user,
+      message: "User registered successfully.",
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });
     console.log("Error in register controller: ", error);
@@ -105,8 +110,7 @@ export const login = async (req, res) => {
     const normalizedUsername = username.toLowerCase().trim();
     //query to check if the user with the username exist
     const query = `
-      SELECT id, name, username, password, bio, skills,
-      followers, reputation, badges, created_at
+      SELECT id, name, username, password, bio, skills, reputation, badges, created_at
       FROM users
       WHERE username = $1
       `;
@@ -144,7 +148,12 @@ export const login = async (req, res) => {
 
     delete user.password;
 
-    res.status(200).json({ user, message: "User logged in successfully." });
+    res.status(200).json({
+      user,
+      message: "User logged in successfully.",
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });
     console.log("Error in login controller: ", error);

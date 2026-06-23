@@ -29,9 +29,26 @@ const authSlice = createSlice({
     setError(state, action) {
       state.error = action.payload;
     },
+    setProfilePic(state, action) {
+      if (state.user) {
+        state.user.profile_pic = action.payload;
+      }
+    },
+    setBanner(state, action) {
+      if (state.user) {
+        state.user.banner = action.payload;
+      }
+    },
   },
 });
 
-export const { setAccessToken, setUser, logout, setLoading, setError } =
-  authSlice.actions;
+export const {
+  setAccessToken,
+  setUser,
+  logout,
+  setLoading,
+  setError,
+  setProfilePic,
+  setBanner,
+} = authSlice.actions;
 export default authSlice.reducer;
