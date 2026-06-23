@@ -43,7 +43,7 @@ export const register = async (req, res) => {
     const query = `
     INSERT INTO users (name, username, password) 
     VALUES ($1, $2, $3) 
-    RETURNING id, name, username, bio, skills, reputation, badges, created_at;
+    RETURNING *;
     `;
 
     //hashing the password using bcrypt
@@ -60,6 +60,7 @@ export const register = async (req, res) => {
     }
 
     const user = result.rows[0];
+    delete user.password;
 
     const accessToken = signAccessToken(user.id);
     const refreshToken = signRefreshToken(user.id);
@@ -110,7 +111,7 @@ export const login = async (req, res) => {
     const normalizedUsername = username.toLowerCase().trim();
     //query to check if the user with the username exist
     const query = `
-      SELECT id, name, username, password, bio, skills, reputation, badges, created_at
+      SELECT *
       FROM users
       WHERE username = $1
       `;
