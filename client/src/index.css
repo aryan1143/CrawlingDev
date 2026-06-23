@@ -96,9 +96,13 @@
     --color-accent-content: #000000;
     --color-card-content: #1e2a3a;
 
-    --page-bg-start: #dde8f0;
+    --page-bg-start: #e6ecf0;
+    --page-bg-mid: #ecf2f6;
+    --page-bg-end: #deeef3;
+    /* --page-bg-start: #dde8f0;
     --page-bg-mid: #ffffff;
-    --page-bg-end: #e6f8ff;
+    --page-bg-end: #e6f8ff; */
+
     --btn-primary-bg: #0a66c2;
     --btn-primary-text: #ffffff;
     --btn-primary-hover: #0854a0;
@@ -160,6 +164,10 @@
   }
 }
 
+[data-theme="dark"] .theme-icon {
+  filter: invert(1);
+}
+
 body {
   font-family: "Source Sans 3", sans-serif;
 }
@@ -175,6 +183,11 @@ body {
 
 button {
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 a.active {
