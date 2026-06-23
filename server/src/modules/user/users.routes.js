@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  deleteAccount,
   updateBadge,
   updateBanner,
   updateProfile,
@@ -14,6 +15,8 @@ import { upload } from "../../config/cloudinary.js";
 const router = Router();
 
 router.patch("/me", updateProfile);
+
+router.delete("/me", deleteAccount);
 
 router.patch("/me/reputation", updateReputation);
 
