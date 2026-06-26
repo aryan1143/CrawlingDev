@@ -1,4 +1,5 @@
 import {
+  deleteFolderEntirelyFromCloudinary,
   deleteFromCloudinary,
   uploadToCloudinary,
 } from "../../config/cloudinary.js";
@@ -340,6 +341,9 @@ export const deleteAccount = async (req, res) => {
     res
       .status(200)
       .json({ message: "User's account deleted successfully.", success: true });
+
+    await deleteFolderEntirelyFromCloudinary(`profiles/${userId}`);
+    await deleteFolderEntirelyFromCloudinary(`projects/${userId}`);
   } catch (error) {
     console.log("Error in deleteAccount controller: ", error);
     return res

@@ -53,4 +53,37 @@ const deleteFromCloudinary = async (imageUrl) => {
   }
 };
 
-export { upload, uploadToCloudinary, deleteFromCloudinary };
+const deleteFolderEntirelyFromCloudinary = async (folderPath) => {
+  try {
+    const prefix = folderPath.endsWith("/") ? folderPath : `${folderPath}/`;
+
+    const cleanFolderPath = folderPath.endsWith("/")
+      ? folderPath.slice(0, -1)
+      : folderPath;
+
+    const resourceTypes = ["image", "video", "raw"];
+
+    await Promise.all(
+      resourceTypes.map((type) =>
+        cloudinary.api.delete_resources_by_prefix(prefix, {
+          resource_type: type,
+          invalidate: true,
+        }),
+      ),
+    );
+
+    const folderDeleteResult =
+      await cloudinary.api.delete_folder(cleanFolderPath);
+
+    return folderDeleteResult;
+  } catch (error) {
+    console.error("Failed to completely remove folder:", error);
+  }
+};
+
+export {
+  upload,
+  uploadToCloudinary,
+  deleteFromCloudinary,
+  deleteFolderEntirelyFromCloudinary,
+};
