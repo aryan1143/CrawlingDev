@@ -4,6 +4,7 @@ import Register from "../../features/auth/pages/Register";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import Profile from "../../features/user/page/Profile";
+import CreatePost from "../../features/project/pages/CreatePost";
 
 const AppRoutes = () => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -28,6 +29,7 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/create" element={<CreatePost />} />
       </Routes>
     </div>
   );

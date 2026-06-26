@@ -61,6 +61,9 @@
     --btn-text: var(--color-primary-content);
     --btn-border: transparent;
 
+    --badge-bg-opacity: 15%;
+    --badge-border-opacity: 25%;
+
     --btn-primary-bg: var(--color-primary);
     --btn-primary-text: var(--color-primary-content);
     --btn-primary-hover: #0854a0;
@@ -107,6 +110,9 @@
     --btn-primary-text: #ffffff;
     --btn-primary-hover: #0854a0;
 
+    --badge-bg-opacity: 5%;
+    --badge-border-opacity: 50%;
+
     --btn-secondary-bg: #f3f4f6;
     --btn-secondary-text: #1e293b;
     --btn-secondary-hover: #e6e9ee;
@@ -151,6 +157,10 @@
     --btn-accent-bg: #f6c67a;
     --btn-accent-text: #0f1720;
     --btn-accent-hover: #f3bf52;
+
+    --badge-bg-opacity: 15%;
+    --badge-border-opacity: 50%;
+
     /* Link tokens (dark) */
     --link-color: #7fb6ff;
     --link-hover: #a7d0ff;

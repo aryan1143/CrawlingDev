@@ -30,6 +30,14 @@ const uploadToCloudinary = (fileBuffer, folderName) => {
   });
 };
 
+export const uploadMultipleToCloudinary = async (files, folderName) => {
+  const uploadPromises = files.map((file) =>
+    uploadToCloudinary(file.buffer, folderName),
+  );
+
+  return Promise.all(uploadPromises);
+};
+
 const deleteFromCloudinary = async (imageUrl) => {
   try {
     const urlParts = imageUrl.split("/");

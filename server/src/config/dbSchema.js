@@ -28,6 +28,7 @@ const createSchema = async () => {
     CREATE TABLE IF NOT EXISTS projects (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
+        category VARCHAR(100) NOT NULL,
         description TEXT NOT NULL,
         tech_stack TEXT[] DEFAULT '{}',
         images TEXT[] DEFAULT '{}',

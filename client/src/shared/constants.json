@@ -1,224 +1,270 @@
 {
-    "skills": [
-        {
-            "name": "Node.js",
-            "bg_color": "#dcfce7",
-            "text_color": "#166534"
-        },
-        {
-            "name": "React",
-            "bg_color": "#dbeafe",
-            "text_color": "#1e40af"
-        },
-        {
-            "name": "MongoDB",
-            "bg_color": "#dcfce7",
-            "text_color": "#166534"
-        },
-        {
-            "name": "Express.js",
-            "bg_color": "#f1f5f9",
-            "text_color": "#334155"
-        },
-        {
-            "name": "JavaScript",
-            "bg_color": "#fef3c7",
-            "text_color": "#92400e"
-        },
-        {
-            "name": "TypeScript",
-            "bg_color": "#dbeafe",
-            "text_color": "#1e40af"
-        },
-        {
-            "name": "Next.js",
-            "bg_color": "#f1f5f9",
-            "text_color": "#334155"
-        },
-        {
-            "name": "Vue.js",
-            "bg_color": "#d1fae5",
-            "text_color": "#065f46"
-        },
-        {
-            "name": "Angular",
-            "bg_color": "#fee2e2",
-            "text_color": "#991b1b"
-        },
-        {
-            "name": "Svelte",
-            "bg_color": "#ffedd5",
-            "text_color": "#9a3412"
-        },
-        {
-            "name": "Tailwind CSS",
-            "bg_color": "#cffafe",
-            "text_color": "#155e75"
-        },
-        {
-            "name": "GraphQL",
-            "bg_color": "#fce7f3",
-            "text_color": "#9d174d"
-        },
-        {
-            "name": "Firebase",
-            "bg_color": "#ffedd5",
-            "text_color": "#9a3412"
-        },
-        {
-            "name": "Supabase",
-            "bg_color": "#d1fae5",
-            "text_color": "#065f46"
-        },
-        {
-            "name": "PostgreSQL",
-            "bg_color": "#dbeafe",
-            "text_color": "#1e40af"
-        },
-        {
-            "name": "Redis",
-            "bg_color": "#ffe4e6",
-            "text_color": "#9f1239"
-        },
-        {
-            "name": "Docker",
-            "bg_color": "#e0f2fe",
-            "text_color": "#075985"
-        },
-        {
-            "name": "Kubernetes",
-            "bg_color": "#dbeafe",
-            "text_color": "#1e40af"
-        },
-        {
-            "name": "AWS",
-            "bg_color": "#ffedd5",
-            "text_color": "#9a3412"
-        },
-        {
-            "name": "Google Cloud",
-            "bg_color": "#e0f2fe",
-            "text_color": "#075985"
-        },
-        {
-            "name": "Go",
-            "bg_color": "#cffafe",
-            "text_color": "#155e75"
-        },
-        {
-            "name": "Rust",
-            "bg_color": "#fef3c7",
-            "text_color": "#92400e"
-        },
-        {
-            "name": "Python",
-            "bg_color": "#dbeafe",
-            "text_color": "#1e40af"
-        },
-        {
-            "name": "PyTorch",
-            "bg_color": "#fee2e2",
-            "text_color": "#991b1b"
-        },
-        {
-            "name": "TensorFlow",
-            "bg_color": "#ffedd5",
-            "text_color": "#9a3412"
-        },
-        {
-            "name": "YOLOv8",
-            "bg_color": "#e0e7ff",
-            "text_color": "#3730a3"
-        },
-        {
-            "name": "React Native",
-            "bg_color": "#dbeafe",
-            "text_color": "#1e40af"
-        },
-        {
-            "name": "Flutter",
-            "bg_color": "#e0f2fe",
-            "text_color": "#075985"
-        },
-        {
-            "name": "Swift",
-            "bg_color": "#ffedd5",
-            "text_color": "#9a3412"
-        },
-        {
-            "name": "Kotlin",
-            "bg_color": "#fae8ff",
-            "text_color": "#86198f"
-        },
-        {
-            "name": "Figma",
-            "bg_color": "#fce7f3",
-            "text_color": "#9d174d"
-        },
-        {
-            "name": "HTML",
-            "bg_color": "#ffedd5",
-            "text_color": "#9a3412"
-        },
-        {
-            "name": "CSS",
-            "bg_color": "#dbeafe",
-            "text_color": "#1e40af"
-        },
-        {
-            "name": "Git",
-            "bg_color": "#fee2e2",
-            "text_color": "#991b1b"
-        }
-    ],
-    "bannerImages" : [
-  {
-    "id": "default-banner",
-    "previewUrl":
-      "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189247/default-banner_qkdrrr.jpg",
-    "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189247/default-banner_qkdrrr.jpg"
-  },
-  {
-    "id": "banner1",
-    "previewUrl":
-      "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782185755/samantha-gades-BlIhVfXbi9s-unsplash_1_zrtzt5.jpg",
-    "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782185463/samantha-gades-BlIhVfXbi9s-unsplash_ycdlif.jpg"
-  },
-  {
-    "id": "banner2",
-    "previewUrl":
-      "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782186299/patrick-tomasso-QMDap1TAu0g-unsplash_1_vi2jye.jpg",
-    "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782185577/patrick-tomasso-QMDap1TAu0g-unsplash_kosxau.jpg"
-  },
-  {
-    "id": "banner3",
-    "previewUrl":
-      "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782188867/greg-rakozy-oMpAz-DN-9I-unsplash_1_sy2imu.jpg",
-    "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782188822/greg-rakozy-oMpAz-DN-9I-unsplash_clr1kn.jpg"
-  },
-  {
-    "id": "banner4",
-    "previewUrl":
-      "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782188894/codioful-formerly-gradienta-QWutu2BRpOs-unsplash_e9hbol.jpg",
-    "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782188894/codioful-formerly-gradienta-QWutu2BRpOs-unsplash_e9hbol.jpg"
-  },
-  {
-    "id": "banner5",
-    "previewUrl":
-      "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189091/pedro-lastra-Nyvq2juw4_o-unsplash_1_fiuqml.jpg",
-    "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189079/pedro-lastra-Nyvq2juw4_o-unsplash_ojpwda.jpg"
-  },
-  {
-    "id": "banner6",
-    "previewUrl":
-      "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189421/shapelined-_JBKdviweXI-unsplash_rrhqq3.jpg",
-    "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189421/shapelined-_JBKdviweXI-unsplash_rrhqq3.jpg"
-  },
-  {
-    "id": "banner7",
-    "previewUrl":
-      "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189494/jeshoots-com-pUAM5hPaCRI-unsplash_2_sekoz3.jpg",
-    "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189488/jeshoots-com-pUAM5hPaCRI-unsplash_orj6lu.jpg"
-  }
-]
+  "skills": [
+    {
+      "name": "Node.js",
+      "bg_color": "#dcfce7",
+      "text_color": "#166534"
+    },
+    {
+      "name": "React",
+      "bg_color": "#dbeafe",
+      "text_color": "#1e40af"
+    },
+    {
+      "name": "MongoDB",
+      "bg_color": "#dcfce7",
+      "text_color": "#166534"
+    },
+    {
+      "name": "Express.js",
+      "bg_color": "#f1f5f9",
+      "text_color": "#334155"
+    },
+    {
+      "name": "JavaScript",
+      "bg_color": "#fef3c7",
+      "text_color": "#92400e"
+    },
+    {
+      "name": "TypeScript",
+      "bg_color": "#dbeafe",
+      "text_color": "#1e40af"
+    },
+    {
+      "name": "Next.js",
+      "bg_color": "#f1f5f9",
+      "text_color": "#334155"
+    },
+    {
+      "name": "Vue.js",
+      "bg_color": "#d1fae5",
+      "text_color": "#065f46"
+    },
+    {
+      "name": "Angular",
+      "bg_color": "#fee2e2",
+      "text_color": "#991b1b"
+    },
+    {
+      "name": "Svelte",
+      "bg_color": "#ffedd5",
+      "text_color": "#9a3412"
+    },
+    {
+      "name": "Tailwind CSS",
+      "bg_color": "#cffafe",
+      "text_color": "#155e75"
+    },
+    {
+      "name": "GraphQL",
+      "bg_color": "#fce7f3",
+      "text_color": "#9d174d"
+    },
+    {
+      "name": "Firebase",
+      "bg_color": "#ffedd5",
+      "text_color": "#9a3412"
+    },
+    {
+      "name": "Supabase",
+      "bg_color": "#d1fae5",
+      "text_color": "#065f46"
+    },
+    {
+      "name": "PostgreSQL",
+      "bg_color": "#dbeafe",
+      "text_color": "#1e40af"
+    },
+    {
+      "name": "Redis",
+      "bg_color": "#ffe4e6",
+      "text_color": "#9f1239"
+    },
+    {
+      "name": "Docker",
+      "bg_color": "#e0f2fe",
+      "text_color": "#075985"
+    },
+    {
+      "name": "Kubernetes",
+      "bg_color": "#dbeafe",
+      "text_color": "#1e40af"
+    },
+    {
+      "name": "AWS",
+      "bg_color": "#ffedd5",
+      "text_color": "#9a3412"
+    },
+    {
+      "name": "Google Cloud",
+      "bg_color": "#e0f2fe",
+      "text_color": "#075985"
+    },
+    {
+      "name": "Go",
+      "bg_color": "#cffafe",
+      "text_color": "#155e75"
+    },
+    {
+      "name": "Rust",
+      "bg_color": "#fef3c7",
+      "text_color": "#92400e"
+    },
+    {
+      "name": "Python",
+      "bg_color": "#dbeafe",
+      "text_color": "#1e40af"
+    },
+    {
+      "name": "PyTorch",
+      "bg_color": "#fee2e2",
+      "text_color": "#991b1b"
+    },
+    {
+      "name": "TensorFlow",
+      "bg_color": "#ffedd5",
+      "text_color": "#9a3412"
+    },
+    {
+      "name": "YOLOv8",
+      "bg_color": "#e0e7ff",
+      "text_color": "#3730a3"
+    },
+    {
+      "name": "React Native",
+      "bg_color": "#dbeafe",
+      "text_color": "#1e40af"
+    },
+    {
+      "name": "Flutter",
+      "bg_color": "#e0f2fe",
+      "text_color": "#075985"
+    },
+    {
+      "name": "Swift",
+      "bg_color": "#ffedd5",
+      "text_color": "#9a3412"
+    },
+    {
+      "name": "Kotlin",
+      "bg_color": "#fae8ff",
+      "text_color": "#86198f"
+    },
+    {
+      "name": "Figma",
+      "bg_color": "#fce7f3",
+      "text_color": "#9d174d"
+    },
+    {
+      "name": "HTML",
+      "bg_color": "#ffedd5",
+      "text_color": "#9a3412"
+    },
+    {
+      "name": "CSS",
+      "bg_color": "#dbeafe",
+      "text_color": "#1e40af"
+    },
+    {
+      "name": "Git",
+      "bg_color": "#fee2e2",
+      "text_color": "#991b1b"
+    }
+  ],
+  "bannerImages": [
+    {
+      "id": "default-banner",
+      "previewUrl": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189247/default-banner_qkdrrr.jpg",
+      "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189247/default-banner_qkdrrr.jpg"
+    },
+    {
+      "id": "banner1",
+      "previewUrl": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782185755/samantha-gades-BlIhVfXbi9s-unsplash_1_zrtzt5.jpg",
+      "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782185463/samantha-gades-BlIhVfXbi9s-unsplash_ycdlif.jpg"
+    },
+    {
+      "id": "banner2",
+      "previewUrl": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782186299/patrick-tomasso-QMDap1TAu0g-unsplash_1_vi2jye.jpg",
+      "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782185577/patrick-tomasso-QMDap1TAu0g-unsplash_kosxau.jpg"
+    },
+    {
+      "id": "banner3",
+      "previewUrl": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782188867/greg-rakozy-oMpAz-DN-9I-unsplash_1_sy2imu.jpg",
+      "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782188822/greg-rakozy-oMpAz-DN-9I-unsplash_clr1kn.jpg"
+    },
+    {
+      "id": "banner4",
+      "previewUrl": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782188894/codioful-formerly-gradienta-QWutu2BRpOs-unsplash_e9hbol.jpg",
+      "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782188894/codioful-formerly-gradienta-QWutu2BRpOs-unsplash_e9hbol.jpg"
+    },
+    {
+      "id": "banner5",
+      "previewUrl": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189091/pedro-lastra-Nyvq2juw4_o-unsplash_1_fiuqml.jpg",
+      "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189079/pedro-lastra-Nyvq2juw4_o-unsplash_ojpwda.jpg"
+    },
+    {
+      "id": "banner6",
+      "previewUrl": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189421/shapelined-_JBKdviweXI-unsplash_rrhqq3.jpg",
+      "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189421/shapelined-_JBKdviweXI-unsplash_rrhqq3.jpg"
+    },
+    {
+      "id": "banner7",
+      "previewUrl": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189494/jeshoots-com-pUAM5hPaCRI-unsplash_2_sekoz3.jpg",
+      "url": "https://res.cloudinary.com/dujfvcxjl/image/upload/v1782189488/jeshoots-com-pUAM5hPaCRI-unsplash_orj6lu.jpg"
+    }
+  ],
+  "categories": [
+    { "id": "web-development", "name": "Web Development" },
+    { "id": "mobile-app", "name": "Mobile App" },
+    { "id": "desktop-application", "name": "Desktop Application" },
+    { "id": "frontend", "name": "Frontend" },
+    { "id": "backend", "name": "Backend" },
+    { "id": "full-stack", "name": "Full Stack" },
+    { "id": "mern-stack", "name": "MERN Stack" },
+    { "id": "e-commerce", "name": "E-Commerce" },
+    { "id": "social-media", "name": "Social Media" },
+    { "id": "chat-application", "name": "Chat Application" },
+    { "id": "portfolio-website", "name": "Portfolio Website" },
+    { "id": "blog-platform", "name": "Blog Platform" },
+    { "id": "cms", "name": "Content Management System" },
+    { "id": "lms", "name": "Learning Management System" },
+    { "id": "project-management", "name": "Project Management" },
+    { "id": "task-management", "name": "Task Management" },
+    { "id": "developer-tools", "name": "Developer Tools" },
+    { "id": "api-development", "name": "API Development" },
+    { "id": "database-management", "name": "Database Management" },
+    { "id": "authentication-security", "name": "Authentication & Security" },
+    { "id": "cloud-computing", "name": "Cloud Computing" },
+    { "id": "devops", "name": "DevOps" },
+    { "id": "ai-ml", "name": "AI & Machine Learning" },
+    { "id": "generative-ai", "name": "Generative AI" },
+    { "id": "nlp", "name": "Natural Language Processing" },
+    { "id": "computer-vision", "name": "Computer Vision" },
+    { "id": "data-science", "name": "Data Science" },
+    { "id": "data-analytics", "name": "Data Analytics" },
+    { "id": "business-intelligence", "name": "Business Intelligence" },
+    { "id": "cybersecurity", "name": "Cybersecurity" },
+    { "id": "blockchain", "name": "Blockchain" },
+    { "id": "fintech", "name": "FinTech" },
+    { "id": "edtech", "name": "EdTech" },
+    { "id": "healthtech", "name": "HealthTech" },
+    { "id": "travel-tourism", "name": "Travel & Tourism" },
+    { "id": "food-delivery", "name": "Food & Delivery" },
+    { "id": "real-estate", "name": "Real Estate" },
+    { "id": "iot", "name": "Internet of Things (IoT)" },
+    { "id": "automation", "name": "Automation" },
+    { "id": "game-development", "name": "Game Development" },
+    { "id": "ar-vr", "name": "AR/VR" },
+    { "id": "streaming-platform", "name": "Streaming Platform" },
+    { "id": "media-entertainment", "name": "Media & Entertainment" },
+    { "id": "productivity", "name": "Productivity" },
+    { "id": "open-source", "name": "Open Source" },
+    { "id": "browser-extension", "name": "Browser Extension" },
+    { "id": "chrome-extension", "name": "Chrome Extension" },
+    { "id": "saas", "name": "Software as a Service (SaaS)" },
+    { "id": "enterprise-software", "name": "Enterprise Software" },
+    { "id": "crm", "name": "Customer Relationship Management (CRM)" },
+    { "id": "erp", "name": "Enterprise Resource Planning (ERP)" },
+    { "id": "monitoring-analytics", "name": "Monitoring & Analytics" }
+  ]
 }
