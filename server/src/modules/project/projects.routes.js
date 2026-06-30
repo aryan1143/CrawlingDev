@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createProject, deleteProject } from "./projects.controller.js";
+import {
+  createProject,
+  deleteProject,
+  getMyProjects,
+} from "./projects.controller.js";
 import { requireAuth } from "../../shared/jwt.js";
 import { upload } from "../../config/cloudinary.js";
 
@@ -9,6 +13,7 @@ import { upload } from "../../config/cloudinary.js";
 const router = Router();
 
 router.post("/", upload.array("images", 3), createProject);
+router.get("/me", getMyProjects);
 router.delete("/:projectId", deleteProject);
 
 export default router;

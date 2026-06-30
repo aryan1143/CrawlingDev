@@ -18,8 +18,14 @@ export const projectApi = createApi({
         method: "DELETE",
       }),
     }),
+    getMyProjects: builder.query({
+      query: () => "projects/me",
+    }),
   }),
 });
 
-export const { useCreateProjectMutation, useDeleteProjectMutation } =
-  projectApi;
+export const {
+  useCreateProjectMutation,
+  useDeleteProjectMutation,
+  useGetMyProjectsQuery,
+} = projectApi;
