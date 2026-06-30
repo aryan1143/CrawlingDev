@@ -193,3 +193,36 @@ export const deleteProject = async (req, res) => {
     });
   }
 };
+
+/**
+ * Gets all of the projects created by the user.
+ *
+ * @param req - Express request object.
+ * @param res - Express response object.
+ */
+export const getMyProjects = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const result = await pool.query(
+      `SELECT *
+       FROM projects
+       WHERE created_by = $1
+       ORDER BY created_at DESC`,
+      [userId],
+    );
+
+    return res.status(200).json({
+      projects: result.rows,
+      count: result.rowCount,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in getMyProjects controller:", error);
+
+    return res.status(500).json({
+      error: "Internal server error.",
+      success: false,
+    });
+  }
+};

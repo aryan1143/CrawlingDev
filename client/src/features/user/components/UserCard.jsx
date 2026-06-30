@@ -22,14 +22,18 @@ import { setProfilePic, setUser } from "../../auth/store/authSlice";
 import toast from "react-hot-toast";
 import useMediaQuery from "../../../shared/hooks/useMediaQuery";
 import { useLogoutUserMutation } from "../../auth/api/auth.api";
+import { useGetMyProjectsQuery } from "../../project/api/project.api";
 
 const bannerImagesArray = constants.bannerImages;
 
 const demoSkils = [];
 
-function StatsCard({ icon, title, value, color = "#0000" }) {
+function StatsCard({ icon, title, value, color = "#0000", to = "/" }) {
   return (
-    <div className="flex gap-3 justify-start items-center border border-gray-400/50 h-16 px-3 max-full rounded-xl">
+    <Link
+      to={to}
+      className="flex gap-3 justify-start items-center border border-gray-400/50 h-16 px-3 max-full rounded-xl"
+    >
       <span
         style={{ backgroundColor: color + "30" }}
         className="p-2 rounded-xl "
@@ -40,7 +44,7 @@ function StatsCard({ icon, title, value, color = "#0000" }) {
         <span className="text-2xl font-semibold">{value}</span>
         <span className="text-sm -mt-1 text-card-content/70">{title}</span>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -49,6 +53,9 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
   const skillsToColorMap = new Map();
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const { data: projectData, isLoading: isProjectDataLoading } =
+    useGetMyProjectsQuery();
 
   skillsColor.forEach((item) => {
     skillsToColorMap.set(item.name, item);
@@ -233,8 +240,13 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
               <StatsCard
                 icon={<FolderOpenDot color="#4287f5" />}
                 title={"Projects"}
-                value={0}
+                value={
+                  isProjectDataLoading
+                    ? "Loading..."
+                    : (projectData && projectData?.count) || 0
+                }
                 color={"#4287f5"}
+                to="/projects"
               />
               <StatsCard
                 icon={<MessageSquareCode color="#22c73b" />}

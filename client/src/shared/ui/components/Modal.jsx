@@ -1,6 +1,13 @@
 import { createPortal } from "react-dom";
 
-const Modal = ({ isOpen, onClose, title, children, className = "" }) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  className = "",
+  containerClassName = "",
+}) => {
   if (!isOpen) return null;
 
   return createPortal(
@@ -9,7 +16,7 @@ const Modal = ({ isOpen, onClose, title, children, className = "" }) => {
       onClick={onClose}
     >
       <div
-        className={`w-full max-w-md rounded-xl bg-card shadow-xl ${className}`}
+        className={`w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl bg-card shadow-xl ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b px-5 py-4">
@@ -23,7 +30,11 @@ const Modal = ({ isOpen, onClose, title, children, className = "" }) => {
           </button>
         </div>
 
-        <div className="p-5">{children}</div>
+        <div
+          className={`max-h-[calc(90vh-72px)] overflow-y-auto p-5 scrollbar-thin ${containerClassName}`}
+        >
+          {children}
+        </div>
       </div>
     </div>,
     document.body,

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import Profile from "../../features/user/page/Profile";
 import CreatePost from "../../features/project/pages/CreatePost";
+import Projects from "../../features/project/pages/Projects";
 
 const AppRoutes = () => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -30,6 +31,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create" element={<CreatePost />} />
+        <Route path="/projects" element={<Projects />} />
       </Routes>
     </div>
   );
