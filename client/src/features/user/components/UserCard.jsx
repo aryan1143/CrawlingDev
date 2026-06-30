@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import constants from "../../../shared/constants.json";
 import {
   Award,
@@ -22,18 +22,15 @@ import { setProfilePic, setUser } from "../../auth/store/authSlice";
 import toast from "react-hot-toast";
 import useMediaQuery from "../../../shared/hooks/useMediaQuery";
 import { useLogoutUserMutation } from "../../auth/api/auth.api";
-import { useGetMyProjectsQuery } from "../../project/api/project.api";
+import Modal from "../../../shared/ui/components/Modal";
 
 const bannerImagesArray = constants.bannerImages;
 
 const demoSkils = [];
 
-function StatsCard({ icon, title, value, color = "#0000", to = "/" }) {
+function StatsCard({ icon, title, value, color = "#0000" }) {
   return (
-    <Link
-      to={to}
-      className="flex gap-3 justify-start items-center border border-gray-400/50 h-16 px-3 max-full rounded-xl"
-    >
+    <div className="flex gap-3 justify-start items-center border border-gray-400/50 h-16 px-3 max-full rounded-xl">
       <span
         style={{ backgroundColor: color + "30" }}
         className="p-2 rounded-xl "
@@ -44,7 +41,7 @@ function StatsCard({ icon, title, value, color = "#0000", to = "/" }) {
         <span className="text-2xl font-semibold">{value}</span>
         <span className="text-sm -mt-1 text-card-content/70">{title}</span>
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -52,10 +49,9 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
   const skillsColor = constants.skills;
   const skillsToColorMap = new Map();
 
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [showAllSkillsModal, setShowAllSkillsModal] = useState(false);
 
-  const { data: projectData, isLoading: isProjectDataLoading } =
-    useGetMyProjectsQuery();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   skillsColor.forEach((item) => {
     skillsToColorMap.set(item.name, item);
@@ -145,6 +141,20 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
       navigate("/login");
     }
   }
+
+  const renderSkills = (skill) => {
+    const colors = skillsToColorMap.get(skill) || {};
+    console.log(colors);
+    return (
+      <span
+        key={skill}
+        style={{ backgroundColor: colors.bg_color, color: colors.text_color }}
+        className="inline-flex h-fit items-center p-2 py-0.5 rounded-full"
+      >
+        {skill}
+      </span>
+    );
+  };
 
   return (
     <div className="md:w-70/100 w-full min-h-full h-fit bg-card md:rounded-xl outline outline-gray-500/20">
@@ -240,13 +250,8 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
               <StatsCard
                 icon={<FolderOpenDot color="#4287f5" />}
                 title={"Projects"}
-                value={
-                  isProjectDataLoading
-                    ? "Loading..."
-                    : (projectData && projectData?.count) || 0
-                }
+                value={0}
                 color={"#4287f5"}
-                to="/projects"
               />
               <StatsCard
                 icon={<MessageSquareCode color="#22c73b" />}
@@ -257,25 +262,28 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
             </div>
           </div>
           <div className="flex flex-col w-full md:w-5/10 md:ml-auto">
-            <h3 className="my-2 text-xl font-semibold">Skills</h3>
+            <span className="w-full flex justify-between items-center">
+              <h3 className="my-2 text-xl font-semibold">Skills</h3>
+              <button
+                onClick={() => setShowAllSkillsModal(true)}
+                className="text-card-content/75 text-[1rem]"
+              >
+                View All
+              </button>
+            </span>
+            <Modal
+              isOpen={showAllSkillsModal}
+              onClose={() => setShowAllSkillsModal(false)}
+              title="Tech Stacks"
+            >
+              <div className="flex flex-wrap gap-2 px-2 pb-2 mt-3">
+                {user?.skills.map(renderSkills)}
+              </div>
+            </Modal>
             <div className="flex gap-1.5 flex-wrap w-full">
               {user?.skills?.length === 0
                 ? "No skills"
-                : user?.skills?.map((skill) => {
-                    return (
-                      <span
-                        key={skill}
-                        className="p-1 px-3 rounded-full w-fit h-fit font-semibold"
-                        style={{
-                          backgroundColor:
-                            skillsToColorMap?.get(skill)?.bg_color,
-                          color: skillsToColorMap?.get(skill)?.text_color,
-                        }}
-                      >
-                        {skill}
-                      </span>
-                    );
-                  })}
+                : user?.skills?.slice(0, 5).map(renderSkills)}
             </div>
             <div className="grid grid-cols-2 gap-2 mt-5 md:mt-auto">
               {user?.linkedin && (
