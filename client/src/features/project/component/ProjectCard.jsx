@@ -12,6 +12,7 @@ import Modal from "../../../shared/ui/components/Modal";
 import { removeProject } from "../store/projectSlice";
 import { formateDateForProjectCard } from "../utils/dateFormater";
 import useMediaQuery from "../../../shared/hooks/useMediaQuery";
+import { useDeleteProjectMutation } from "../api/project.api";
 
 const techStacksColorMap = new Map(
   constants.skills.map((t) => [
@@ -23,9 +24,9 @@ const categoriesMap = new Map(constants.categories.map((c) => [c.id, c.name]));
 
 const ProjectCard = ({
   project,
-  onDelete,
-  deleteProject,
-  isDeleting,
+  onDelete = () => {
+    console.log("Project deleted");
+  },
   className = "",
   buttons = false,
   isSmall = false,
@@ -56,13 +57,15 @@ const ProjectCard = ({
     setScrolledTo((prev) => (isLeft ? prev - 1 : prev + 1));
   };
 
+  const [deleteProject, { isLoading }] = useDeleteProjectMutation();
+
   const handleOnDeleteProject = async () => {
     if (!window.confirm("Are you sure you want to delete this project?"))
       return;
 
     try {
       await deleteProject(project.id);
-      dispatch(removeProject());
+      dispatch(removeProject(project.id));
       toast.success("Project deleted successfully", {
         position: isDesktop ? "bottom-right" : "top-center",
       });
@@ -96,7 +99,7 @@ const ProjectCard = ({
         className={`relative flex flex-col bg-card text-card-content mx-auto md:mt-4 rounded-xl md:border border-card-content/20 scrollbar-thin 
           ${isSmall ? "overflow-hidden w-full h-fit border border-card-content/30" : "overflow-y-auto w-full md:w-9/10 grow"}`}
       >
-        {isDeleting && (
+        {isLoading && (
           <div className="absolute inset-0 flex flex-col gap-2 justify-center items-center bg-card-content/10 backdrop-blur-2xl md:rounded-b-xl z-30">
             <PuffLoader color="var(--color-card-content)" />
             <p className="font-semibold text-2xl text-card-content/75">

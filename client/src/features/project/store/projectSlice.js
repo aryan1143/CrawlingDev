@@ -17,7 +17,11 @@ const projectSlice = createSlice({
       state.projects = action.payload;
     },
     removeProject(state, action) {
-      state.projects.shift();
+      const projectId = action.payload;
+      const updatedProjectsArr = state.projects.filter(
+        (project) => project?.id !== projectId,
+      );
+      state.projects = updatedProjectsArr;
     },
   },
 });

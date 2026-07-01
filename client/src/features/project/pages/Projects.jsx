@@ -10,6 +10,8 @@ import ProjectUtils from "../component/ProjectUtils";
 import FilterModal from "../component/FilterModal";
 import Modal from "../../../shared/ui/components/Modal";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setProjects } from "../store/projectSlice";
 
 const sortByOptions = [
   { value: "latest", label: "Latest" },
@@ -26,11 +28,17 @@ const Projects = () => {
   const [sortBy, setSortBy] = useState("latest");
   const [showSortByModal, setShowSortByModal] = useState(false);
 
-  const [projects, setProjects] = useState([]);
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { data, error, isLoading } = useGetMyProjectsQuery();
+
+  useEffect(() => {
+    if (!data) return;
+    dispatch(setProjects(data.projects));
+  }, [data, isLoading]);
+  const projects = useSelector((state) => state.project.projects);
+  console.log(projects);
 
   const handleSkillToggle = (skill) => {
     setSelectedSkills((prev) =>
@@ -47,9 +55,9 @@ const Projects = () => {
   };
 
   const filteredAndSortedProjects = useMemo(() => {
-    if (!data?.projects) return [];
+    if (!projects) return [];
 
-    let baseProjects = [...data.projects];
+    let baseProjects = [...projects];
     if (sortBy === "oldest") {
       baseProjects.reverse();
     }
@@ -65,7 +73,7 @@ const Projects = () => {
 
       return categoryMatch && skillMatch;
     });
-  }, [data?.projects, sortBy, selectedCategories, selectedSkills]);
+  }, [projects, sortBy, selectedCategories, selectedSkills]);
 
   return (
     <Page className="relative flex justify-between px-0 py-0 md:py-8 text-card-content overflow-y-auto md:overflow-hidden">
@@ -116,7 +124,7 @@ const Projects = () => {
       </div>
       {isDesktop && (
         <ProjectUtils
-          projects={data?.projects}
+          projects={projects}
           handleCategoryToggle={handleCategoryToggle}
           handleSkillToggle={handleSkillToggle}
           selectedCategories={selectedCategories}
