@@ -31,7 +31,8 @@ export const getFeed = async (req, res) => {
 				u.name AS author_name,
 				u.username AS author_username,
 				u.profile_pic AS author_profile_pic,
-				u.reputation AS author_reputation
+				u.reputation AS author_reputation,
+				u.bio AS author_bio
 			FROM projects p
 			INNER JOIN users u ON u.id = p.created_by
 			WHERE p.created_by <> $1

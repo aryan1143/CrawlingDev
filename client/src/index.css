@@ -204,3 +204,16 @@ a.active {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
+
+.comment-box {
+  animation: moveUp 0.1s ease-in-out;
+}
+
+@keyframes moveUp {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
