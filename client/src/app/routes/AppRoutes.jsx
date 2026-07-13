@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import Profile from "../../features/user/page/Profile";
 import CreatePost from "../../features/project/pages/CreatePost";
 import Projects from "../../features/project/pages/Projects";
+import HomePage from "../../features/feed/pages/HomePage";
 
 const AppRoutes = () => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -27,6 +28,7 @@ const AppRoutes = () => {
   return (
     <div className="h-full w-full overflow-y-auto">
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
