@@ -34,6 +34,7 @@ const createSchema = async () => {
         images TEXT[] DEFAULT '{}',
         github_link VARCHAR(255),
         live_link VARCHAR(255),
+        likes_count INT DEFAULT 0 NOT NULL,
         created_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -47,12 +48,19 @@ const createSchema = async () => {
         helpful_votes INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS post_likes (
+      post_id BIGINT REFERENCES projects(id) ON DELETE CASCADE,
+      user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (post_id, user_id) 
+    );
   `;
 
   try {
     console.log("Building database tables...");
     await pool.query(schemaQuery);
-    console.log("Tables created successfully!");
+    console.log("Tables created/verified successfully!");
   } catch (error) {
     console.error("Error creating tables:", error.message);
   }

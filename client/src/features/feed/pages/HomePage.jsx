@@ -2,18 +2,30 @@ import React, { useState } from "react";
 import Page from "../../../shared/ui/Page";
 import { useGetMyfeedQuery } from "../api/feed.api";
 import FeedProjectCard from "../components/FeedProjectCard";
-import ProjectUtils from "../../project/component/ProjectUtils";
 import FeedUtils from "../components/FeedUtils";
 import useMediaQuery from "../../../shared/hooks/useMediaQuery";
-import DesktopCommentBox from "../components/DesktopCommentBox";
-import MobileCommentBox from "../components/MobileCommentBox";
 import FeedProjectCardSkeleton from "../components/FeedProjectCardSkeleton";
+import { useDispatch, useSelector } from "react-redux";
+import { setFeed } from "../store/feedSlice";
+import { useEffect } from "react";
 
 const HomePage = () => {
   const [isCommentBoxOpened, setIsCommentBoxOpened] = useState(false);
   const [openedCommentBoxId, setOpenedCommentBoxId] = useState(null);
   const { data, isLoading, error } = useGetMyfeedQuery({ page: 1, limit: 10 });
   console.log(data);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (data?.feed && data.feed.length > 0) {
+      dispatch(setFeed(data.feed));
+    }
+  }, [data, dispatch]);
+
+  const feed = useSelector((state) => state.feed.feed);
+
+  console.log("feed:  ", feed);
+
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
@@ -25,8 +37,8 @@ const HomePage = () => {
         {isLoading &&
           !data?.feed &&
           [1, 2, 3, 4].map((i) => <FeedProjectCardSkeleton key={i} />)}
-        {data?.feed &&
-          data.feed.map((project) => (
+        {feed &&
+          feed.map((project) => (
             <FeedProjectCard
               key={project.id}
               project={project}

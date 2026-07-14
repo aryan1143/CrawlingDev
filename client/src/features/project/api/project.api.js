@@ -18,6 +18,18 @@ export const projectApi = createApi({
         method: "DELETE",
       }),
     }),
+    likePost: builder.mutation({
+      query: (projectId) => ({
+        url: `projects/like/${projectId}`,
+        method: "POST",
+      }),
+    }),
+    dislikePost: builder.mutation({
+      query: (projectId) => ({
+        url: `projects/like/${projectId}`,
+        method: "DELETE",
+      }),
+    }),
     getMyProjects: builder.query({
       query: () => "projects/me",
     }),
@@ -27,5 +39,7 @@ export const projectApi = createApi({
 export const {
   useCreateProjectMutation,
   useDeleteProjectMutation,
+  useLikePostMutation,
+  useDislikePostMutation,
   useGetMyProjectsQuery,
 } = projectApi;

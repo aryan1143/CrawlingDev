@@ -226,3 +226,102 @@ export const getMyProjects = async (req, res) => {
     });
   }
 };
+
+/**
+ * like a post.
+ *
+ * @param req - Express request object.
+ * @param res - Express response object.
+ */
+export const likePost = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { projectId } = req.params;
+
+    const likeResult = await pool.query(
+      `INSERT INTO post_likes (post_id, user_id)
+      VALUES ($1, $2) 
+      ON CONFLICT (post_id, user_id) DO NOTHING 
+      RETURNING *`,
+      [projectId, userId],
+    );
+
+    if (likeResult.rowCount > 0) {
+      const incrementLikeResult = await pool.query(
+        `UPDATE projects 
+        SET likes_count = likes_count + 1 
+        WHERE id = $1 
+        RETURNING likes_count`,
+        [projectId],
+      );
+
+      return res.status(201).json({
+        success: true,
+        likesCount: incrementLikeResult.rows[0].likes_count,
+        isNewLike: true,
+      });
+    }
+
+    return res.status(200).json({
+      success: false,
+      message: "Already liked",
+      isNewLike: false,
+    });
+  } catch (error) {
+    console.error("Error in likePost controller:", error);
+    return res.status(500).json({
+      error: "Internal server error.",
+      success: false,
+    });
+  }
+};
+
+/**
+ * unlike (dislike) a post.
+ *
+ * @param req - Express request object.
+ * @param res - Express response object.
+ */
+export const dislikePost = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { projectId } = req.params;
+
+    const unlikeResult = await pool.query(
+      `DELETE FROM post_likes
+       WHERE post_id = $1
+         AND user_id = $2
+       RETURNING *`,
+      [projectId, userId],
+    );
+
+    if (unlikeResult.rowCount === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "Post was not liked",
+        isRemoved: false,
+      });
+    }
+
+    const decrementLikeResult = await pool.query(
+      `UPDATE projects
+       SET likes_count = GREATEST(likes_count - 1, 0)
+       WHERE id = $1
+       RETURNING likes_count`,
+      [projectId],
+    );
+
+    return res.status(200).json({
+      success: true,
+      likesCount: decrementLikeResult.rows[0].likes_count,
+      isRemoved: true,
+    });
+  } catch (error) {
+    console.error("Error in dislikePost controller:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error.",
+    });
+  }
+};
