@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { PuffLoader } from "react-spinners";
 import {
   ArrowLeft,
@@ -11,8 +11,8 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { FaGithub, FaGlobe, FaStar } from "react-icons/fa";
 import { MdOutlineReviews } from "react-icons/md";
-import { VscThumbsup } from "react-icons/vsc";
-import { VscThumbsupFilled } from "react-icons/vsc";
+import { VscThumbsup, VscThumbsupFilled } from "react-icons/vsc";
+import { toast } from "react-hot-toast";
 
 import constants from "../../../shared/constants.json";
 import DropdownMenu from "../../../shared/ui/components/DropdownMenu";
@@ -22,6 +22,14 @@ import useMediaQuery from "../../../shared/hooks/useMediaQuery";
 import { formateDateForFeed } from "../utils/formateDateForFeed";
 import DesktopCommentBox from "./DesktopCommentBox";
 import MobileCommentBox from "./MobileCommentBox";
+import {
+  useDislikePostMutation,
+  useGetProjectReviewsQuery,
+  useLazyGetProjectReviewsQuery,
+  useLikePostMutation,
+  useReviewPostMutation,
+} from "../../project/api/project.api";
+import { confirmLike, tempAddLike, tempRemoveLike } from "../store/feedSlice";
 
 const techStacksColorMap = new Map(
   constants.skills.map((t) => [
@@ -43,10 +51,55 @@ const FeedProjectCard = ({
   const [scrolledTo, setScrolledTo] = useState(1);
 
   const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const [reviews, setReviews] = useState([]);
 
   const imageContainerRef = useRef(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const dispatch = useDispatch();
+  const [likePost, { isLoading: isLiking }] = useLikePostMutation();
+  const [dislikePost, { isLoading: isDisliking }] = useDislikePostMutation();
+
+  async function onLikeClick(projectId, isLiked) {
+    if (isLiking || isDisliking) return;
+
+    if (isLiked) {
+      try {
+        dispatch(tempRemoveLike(projectId));
+        const response = await dislikePost(projectId);
+        dispatch(
+          confirmLike({
+            projectId,
+            likes_count: response.data.likesCount,
+            is_liked: false,
+          }),
+        );
+      } catch (error) {
+        dispatch(tempAddLike(projectId));
+        toast.error(error?.data?.error || "Failed to dislike the project!", {
+          position: "top-center",
+        });
+      }
+    } else {
+      try {
+        dispatch(tempAddLike(projectId));
+        const response = await likePost(projectId);
+        dispatch(
+          confirmLike({
+            projectId,
+            likes_count: response.data.likesCount,
+            is_liked: true,
+          }),
+        );
+      } catch (error) {
+        dispatch(tempRemoveLike(projectId));
+        toast.error(error?.data?.error || "Failed to like the project!", {
+          position: "top-center",
+        });
+      }
+    }
+  }
 
   const scrollSelf = (direction) => {
     const container = imageContainerRef.current;
@@ -66,6 +119,35 @@ const FeedProjectCard = ({
 
     setScrolledTo((prev) => (isLeft ? prev - 1 : prev + 1));
   };
+
+  const [reviewPost, { isLoading: isPostingReview }] = useReviewPostMutation();
+
+  const onReviewSubmit = async () => {
+    try {
+      const response = await reviewPost({
+        projectId: project.id,
+        comment,
+        rating,
+      });
+      setReviews([response?.data?.review, ...reviews]);
+    } catch (error) {
+      toast.error(error?.data?.error || "Failed to post the review!", {
+        position: "top-center",
+      });
+    }
+  };
+
+  const [getProjectReviews, { data, error, isFetching }] =
+    useLazyGetProjectReviewsQuery();
+
+  const fetchReviews = () => {
+    getProjectReviews({ projectId: project.id });
+  };
+
+  useEffect(() => {
+    if (isFetching || !data?.reviews) return;
+    setReviews(data.reviews);
+  }, [data, isFetching]);
 
   const renderTechStack = (techStack) => {
     const colors = techStacksColorMap.get(techStack) || {};
@@ -182,20 +264,30 @@ const FeedProjectCard = ({
 
           <footer className="flex w-full px-2 md:px-4 gap-6 text-xl md:text-[1.05rem] mt-3 pb-1 items-center">
             <span className="h-fit flex gap-1 justify-center items-center text-card-content/70 hover:text-card-content/85 cursor-pointer">
-              <button className="flex justify-center items-center gap-1">
-                <VscThumbsup className="size-6 -mt-1" />
-                <p className="h-fit font-semibold">0</p>
+              <button
+                onClick={() => onLikeClick(project.id, project.is_liked)}
+                className={`flex justify-center items-center gap-1 ${isLiking || isDisliking ? "opacity-60" : ""}`}
+              >
+                {project.is_liked ? (
+                  <VscThumbsupFilled className="size-6 -mt-1 text-card-content/95" />
+                ) : (
+                  <VscThumbsup className="size-6 -mt-1" />
+                )}
+                <p className="h-fit font-semibold">
+                  {project.likes_count || 0}
+                </p>
               </button>
             </span>
             <button
               onClick={() => {
                 setIsCommentBoxOpened(true);
                 setOpenedCommentBoxId(project.id);
+                fetchReviews();
               }}
               className="flex gap-1 justify-center items-center text-card-content/70 hover:text-card-content/85 cursor-pointer"
             >
               <MdOutlineReviews className="size-6 -mb-0.5" />
-              <p className="h-fit font-semibold">0</p>
+              <p className="h-fit font-semibold">{project?.reviews_count}</p>
             </button>
             {project?.github_link && (
               <Link
@@ -220,12 +312,27 @@ const FeedProjectCard = ({
           {isCommentBoxOpened &&
             openedCommentBoxId === project.id &&
             (isDesktop ? (
-              <DesktopCommentBox setRating={setRating} rating={rating} />
+              <DesktopCommentBox
+                setRating={setRating}
+                rating={rating}
+                comment={comment}
+                setComment={setComment}
+                onSubmit={onReviewSubmit}
+                isSubmiting={isPostingReview}
+                reviews={reviews}
+                isFetching={isFetching}
+              />
             ) : (
               <MobileCommentBox
                 setIsCommentBoxOpened={setIsCommentBoxOpened}
                 setRating={setRating}
                 rating={rating}
+                comment={comment}
+                setComment={setComment}
+                onSubmit={onReviewSubmit}
+                isSubmiting={isPostingReview}
+                reviews={reviews}
+                isFetching={isFetching}
               />
             ))}
         </section>

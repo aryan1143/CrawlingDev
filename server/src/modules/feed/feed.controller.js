@@ -27,12 +27,19 @@ export const getFeed = async (req, res) => {
 				p.github_link,
 				p.live_link,
 				p.created_at,
+				p.likes_count,
+				p.reviews_count,
 				u.id AS author_id,
 				u.name AS author_name,
 				u.username AS author_username,
 				u.profile_pic AS author_profile_pic,
 				u.reputation AS author_reputation,
-				u.bio AS author_bio
+				u.bio AS author_bio,
+				EXISTS (
+					SELECT 1 FROM post_likes l 
+					WHERE l.post_id = p.id 
+					AND l.user_id = $1
+				) AS is_liked
 			FROM projects p
 			INNER JOIN users u ON u.id = p.created_by
 			WHERE p.created_by <> $1
