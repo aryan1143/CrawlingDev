@@ -28,6 +28,7 @@ export const getFeed = async (req, res) => {
 				p.live_link,
 				p.created_at,
 				p.likes_count,
+				p.reviews_count,
 				u.id AS author_id,
 				u.name AS author_name,
 				u.username AS author_username,

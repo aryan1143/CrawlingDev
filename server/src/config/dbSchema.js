@@ -35,6 +35,7 @@ const createSchema = async () => {
         github_link VARCHAR(255),
         live_link VARCHAR(255),
         likes_count INT DEFAULT 0 NOT NULL,
+        reviews_count INT DEFAULT 0 NOT NULL,
         created_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

@@ -1,8 +1,20 @@
 import { X } from "lucide-react";
 import React from "react";
 import ReviewForm from "./ReviewForm";
+import ReviewCard from "./ReviewCard";
+import ReviewCardSkeleton from "./ReviewCardSkeleton";
 
-const MobileCommentBox = ({ setIsCommentBoxOpened, setRating, rating }) => {
+const MobileCommentBox = ({
+  setIsCommentBoxOpened,
+  setRating,
+  rating,
+  comment,
+  setComment,
+  onSubmit,
+  isSubmiting,
+  reviews,
+  isFetching,
+}) => {
   return (
     <div
       onClick={() => setIsCommentBoxOpened(false)}
@@ -18,7 +30,26 @@ const MobileCommentBox = ({ setIsCommentBoxOpened, setRating, rating }) => {
             <X />
           </button>
         </span>
-        <ReviewForm setRating={setRating} rating={rating} />
+        {isFetching
+          ? [1, 2].map((e) => <ReviewCardSkeleton key={e} />)
+          : reviews.map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
+        {!isFetching && reviews.length <= 0 ? (
+          <div className="w-full flex justify-center items-center">
+            No Reviews
+          </div>
+        ) : (
+          ""
+        )}
+        <ReviewForm
+          setRating={setRating}
+          rating={rating}
+          comment={comment}
+          setComment={setComment}
+          onSubmit={onSubmit}
+          isSubmiting={isSubmiting}
+        />
       </div>
     </div>
   );

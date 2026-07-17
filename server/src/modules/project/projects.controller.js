@@ -325,3 +325,283 @@ export const dislikePost = async (req, res) => {
     });
   }
 };
+
+/**
+ * create a new review for a project.
+ *
+ * @param req - Express request object.
+ * @param res - Express response object.
+ */
+export const createReview = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { projectId, comment, rating } = req.body;
+
+    if (!projectId || rating === undefined || rating === null) {
+      return res.status(400).json({
+        error: "Project ID and rating are required.",
+        success: false,
+      });
+    }
+
+    if (typeof rating !== "number" || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        error: "Rating must be a number between 1 and 5.",
+        success: false,
+      });
+    }
+
+    if (typeof projectId !== "number" || !Number.isInteger(projectId)) {
+      return res.status(400).json({
+        error: "Invalid project ID provided.",
+        success: false,
+      });
+    }
+
+    if (comment !== undefined && comment !== null) {
+      if (typeof comment !== "string") {
+        return res.status(400).json({
+          error: "Comment must be a string.",
+          success: false,
+        });
+      }
+
+      const trimmedComment = comment.trim();
+      if (trimmedComment.length === 0) {
+        return res.status(400).json({
+          error: "Comment cannot be empty.",
+          success: false,
+        });
+      }
+    }
+
+    const projectCheck = await pool.query(
+      "SELECT id FROM projects WHERE id = $1",
+      [projectId],
+    );
+    if (projectCheck.rowCount === 0) {
+      return res.status(404).json({
+        error: "Project not found.",
+        success: false,
+      });
+    }
+
+    const existingReview = await pool.query(
+      "SELECT id FROM reviews WHERE project_id = $1 AND user_id = $2",
+      [projectId, userId],
+    );
+    if (existingReview.rowCount > 0) {
+      return res.status(400).json({
+        error: "You have already reviewed this project.",
+        success: false,
+      });
+    }
+
+    const insertQuery = `
+      INSERT INTO reviews (project_id, user_id, comment, rating)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, project_id, user_id, comment, rating, helpful_votes, created_at
+    `;
+    const values = [
+      projectId,
+      userId,
+      comment && comment.trim() !== "" ? comment.trim() : null,
+      rating,
+    ];
+
+    const result = await pool.query(insertQuery, values);
+
+    if (result.rowCount === 0) {
+      return res.status(500).json({
+        error: "Failed to create review.",
+        success: false,
+      });
+    }
+
+    const incrementReviewsResult = await pool.query(
+      `UPDATE projects 
+        SET reviews_count = reviews_count + 1 
+        WHERE id = $1 
+        RETURNING reviews_count`,
+      [projectId],
+    );
+
+    const newReview = result.rows[0];
+
+    res.status(201).json({
+      review: newReview,
+      reviewsCount: incrementReviewsResult?.rows[0]?.reviews_count,
+      message: "Review created successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in createReview controller:", error);
+    return res.status(500).json({
+      error: "Internal server error.",
+      success: false,
+    });
+  }
+};
+
+/**
+ * delete a review by ID.
+ *
+ * @param req - Express request object.
+ * @param res - Express response object.
+ */
+export const deleteReview = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const reviewId = parseInt(req.params.id, 10);
+
+    if (!reviewId || isNaN(reviewId) || reviewId <= 0) {
+      return res.status(400).json({
+        error: "Invalid review ID provided.",
+        success: false,
+      });
+    }
+
+    const reviewCheck = await pool.query(
+      "SELECT id, user_id, project_id FROM reviews WHERE id = $1",
+      [reviewId],
+    );
+
+    if (reviewCheck.rowCount === 0) {
+      return res.status(404).json({
+        error: "Review not found.",
+        success: false,
+      });
+    }
+
+    const review = reviewCheck.rows[0];
+
+    if (review.user_id !== userId) {
+      return res.status(403).json({
+        error: "You are not authorized to delete this review.",
+        success: false,
+      });
+    }
+
+    const deleteResult = await pool.query(
+      "DELETE FROM reviews WHERE id = $1 RETURNING id",
+      [reviewId],
+    );
+
+    if (deleteResult.rowCount === 0) {
+      return res.status(500).json({
+        error: "Failed to delete review.",
+        success: false,
+      });
+    }
+
+    const decrementReviewsResult = await pool.query(
+      `UPDATE projects 
+        SET reviews_count = reviews_count - 1 
+        WHERE id = $1 
+        RETURNING reviews_count`,
+      [reviewCheck.rows[0].project_id],
+    );
+
+    res.status(200).json({
+      message: "Review deleted successfully.",
+      success: true,
+      reviewsCount: decrementReviewsResult?.row[0]?.reviews_count,
+      data: {
+        reviewId: reviewId,
+        projectId: review.projectId,
+      },
+    });
+  } catch (error) {
+    console.error("Error in deleteReview controller:", error);
+    return res.status(500).json({
+      error: "Internal server error.",
+      success: false,
+    });
+  }
+};
+
+/**
+ * get reviews for a specific project.
+ *
+ * @param req - Express request object.
+ * @param res - Express response object.
+ */
+export const getProjectReviews = async (req, res) => {
+  try {
+    const projectId = parseInt(req.params.projectId, 10);
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const offset = parseInt(req.query.offset, 10) || 0;
+
+    if (!projectId || isNaN(projectId) || projectId <= 0) {
+      return res.status(400).json({
+        error: "Invalid project ID provided.",
+        success: false,
+      });
+    }
+
+    if (limit < 1 || limit > 100) {
+      return res.status(400).json({
+        error: "Limit must be between 1 and 100.",
+        success: false,
+      });
+    }
+    if (offset < 0) {
+      return res.status(400).json({
+        error: "Offset must be a non-negative number.",
+        success: false,
+      });
+    }
+
+    const projectCheck = await pool.query(
+      "SELECT id, reviews_count FROM projects WHERE id = $1",
+      [projectId],
+    );
+    if (projectCheck.rowCount === 0) {
+      return res.status(404).json({
+        error: "Project not found.",
+        success: false,
+      });
+    }
+
+    const totalReviews = parseInt(projectCheck.rows[0].reviews_count, 10);
+
+    const query = `
+      SELECT 
+        r.id,
+        r.project_id,
+        r.user_id,
+        r.comment,
+        r.rating,
+        r.helpful_votes,
+        r.created_at,
+        u.username,
+        u.profile_pic
+      FROM reviews r
+      JOIN users u ON r.user_id = u.id
+      WHERE r.project_id = $1
+      ORDER BY r.created_at DESC
+      LIMIT $2 OFFSET $3
+    `;
+    const result = await pool.query(query, [projectId, limit, offset]);
+
+    const reviews = result.rows;
+
+    res.status(200).json({
+      reviews,
+      pagination: {
+        total: totalReviews,
+        limit,
+        offset,
+        hasMore: offset + limit < totalReviews,
+      },
+      message: "Reviews fetched successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in getProjectReviews controller:", error);
+    return res.status(500).json({
+      error: "Internal server error.",
+      success: false,
+    });
+  }
+};

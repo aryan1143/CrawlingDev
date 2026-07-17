@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { PuffLoader } from "react-spinners";
 import {
   ArrowLeft,
@@ -24,7 +24,10 @@ import DesktopCommentBox from "./DesktopCommentBox";
 import MobileCommentBox from "./MobileCommentBox";
 import {
   useDislikePostMutation,
+  useGetProjectReviewsQuery,
+  useLazyGetProjectReviewsQuery,
   useLikePostMutation,
+  useReviewPostMutation,
 } from "../../project/api/project.api";
 import { confirmLike, tempAddLike, tempRemoveLike } from "../store/feedSlice";
 
@@ -48,6 +51,9 @@ const FeedProjectCard = ({
   const [scrolledTo, setScrolledTo] = useState(1);
 
   const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const [reviews, setReviews] = useState([]);
 
   const imageContainerRef = useRef(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -113,6 +119,35 @@ const FeedProjectCard = ({
 
     setScrolledTo((prev) => (isLeft ? prev - 1 : prev + 1));
   };
+
+  const [reviewPost, { isLoading: isPostingReview }] = useReviewPostMutation();
+
+  const onReviewSubmit = async () => {
+    try {
+      const response = await reviewPost({
+        projectId: project.id,
+        comment,
+        rating,
+      });
+      setReviews([response?.data?.review, ...reviews]);
+    } catch (error) {
+      toast.error(error?.data?.error || "Failed to post the review!", {
+        position: "top-center",
+      });
+    }
+  };
+
+  const [getProjectReviews, { data, error, isFetching }] =
+    useLazyGetProjectReviewsQuery();
+
+  const fetchReviews = () => {
+    getProjectReviews({ projectId: project.id });
+  };
+
+  useEffect(() => {
+    if (isFetching || !data?.reviews) return;
+    setReviews(data.reviews);
+  }, [data, isFetching]);
 
   const renderTechStack = (techStack) => {
     const colors = techStacksColorMap.get(techStack) || {};
@@ -247,11 +282,12 @@ const FeedProjectCard = ({
               onClick={() => {
                 setIsCommentBoxOpened(true);
                 setOpenedCommentBoxId(project.id);
+                fetchReviews();
               }}
               className="flex gap-1 justify-center items-center text-card-content/70 hover:text-card-content/85 cursor-pointer"
             >
               <MdOutlineReviews className="size-6 -mb-0.5" />
-              <p className="h-fit font-semibold">0</p>
+              <p className="h-fit font-semibold">{project?.reviews_count}</p>
             </button>
             {project?.github_link && (
               <Link
@@ -276,12 +312,27 @@ const FeedProjectCard = ({
           {isCommentBoxOpened &&
             openedCommentBoxId === project.id &&
             (isDesktop ? (
-              <DesktopCommentBox setRating={setRating} rating={rating} />
+              <DesktopCommentBox
+                setRating={setRating}
+                rating={rating}
+                comment={comment}
+                setComment={setComment}
+                onSubmit={onReviewSubmit}
+                isSubmiting={isPostingReview}
+                reviews={reviews}
+                isFetching={isFetching}
+              />
             ) : (
               <MobileCommentBox
                 setIsCommentBoxOpened={setIsCommentBoxOpened}
                 setRating={setRating}
                 rating={rating}
+                comment={comment}
+                setComment={setComment}
+                onSubmit={onReviewSubmit}
+                isSubmiting={isPostingReview}
+                reviews={reviews}
+                isFetching={isFetching}
               />
             ))}
         </section>
