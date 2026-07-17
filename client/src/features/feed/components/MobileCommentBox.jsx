@@ -33,7 +33,7 @@ const MobileCommentBox = ({
         {isFetching
           ? [1, 2].map((e) => <ReviewCardSkeleton key={e} />)
           : reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
+              <ReviewCard key={review?.id} review={review} />
             ))}
         {!isFetching && reviews.length <= 0 ? (
           <div className="w-full flex justify-center items-center">
