@@ -26,11 +26,19 @@ const ReviewForm = ({
     e.preventDefault();
     setIsTriedToSubmit(true);
     if (rating <= 0) {
-      console.log(rating);
       toast.error("Please rate the project to post a review!", {
         position: "top-center",
       });
+      return;
     }
+
+    if (!comment) {
+      toast.error("Please write a review first!", {
+        position: "top-center",
+      });
+      return;
+    }
+
     onSubmit();
   }
 

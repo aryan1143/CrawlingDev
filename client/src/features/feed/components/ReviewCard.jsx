@@ -15,7 +15,7 @@ const ReviewCard = ({ review }) => {
               src={
                 review?.user_id === user?.id
                   ? user?.profile_pic
-                  : review.profile_pic
+                  : review?.profile_pic
               }
               className="object-cover w-full h-full rounded-full"
             />
@@ -25,7 +25,7 @@ const ReviewCard = ({ review }) => {
               <h3 className="font-semibold -mb-1 truncate w-6/10 text-[0.92rem]">
                 {review?.user_id === user.id
                   ? user?.name + " (You)"
-                  : review.name}
+                  : review?.name}
               </h3>
               <div className="w-4/10 flex justify-end">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -40,14 +40,14 @@ const ReviewCard = ({ review }) => {
               </div>
             </div>
             <p className="text-[0.85rem] text-card-content/70 truncate min-w-8/10 w-fit">
-              {(review?.user_id === user.id ? user?.bio : review.bio) ||
+              {(review?.user_id === user.id ? user?.bio : review?.bio) ||
                 "User hasn't set any bio yet"}
             </p>
           </div>
         </div>
       </div>
       <div className="w-full h-content px-2 pl-10 -mt-1">
-        {review.comment || ""}
+        {review?.comment || ""}
       </div>
     </div>
   );
