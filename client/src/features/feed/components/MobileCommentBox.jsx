@@ -3,6 +3,7 @@ import React from "react";
 import ReviewForm from "./ReviewForm";
 import ReviewCard from "./ReviewCard";
 import ReviewCardSkeleton from "./ReviewCardSkeleton";
+import { useSelector } from "react-redux";
 
 const MobileCommentBox = ({
   setIsCommentBoxOpened,
@@ -15,6 +16,9 @@ const MobileCommentBox = ({
   reviews,
   isFetching,
 }) => {
+  const user = useSelector((state) => state.auth.user);
+  const hasUserReviewed = reviews.find((review) => review.user_id === user.id);
+
   return (
     <div
       onClick={() => setIsCommentBoxOpened(false)}
@@ -36,20 +40,24 @@ const MobileCommentBox = ({
               <ReviewCard key={review?.id} review={review} />
             ))}
         {!isFetching && reviews.length <= 0 ? (
-          <div className="w-full flex justify-center items-center">
-            No Reviews
-          </div>
+          <>
+            <div className="w-full flex justify-center items-center">
+              No Reviews
+            </div>
+            {!hasUserReviewed && (
+              <ReviewForm
+                setRating={setRating}
+                rating={rating}
+                comment={comment}
+                setComment={setComment}
+                onSubmit={onSubmit}
+                isSubmiting={isSubmiting}
+              />
+            )}
+          </>
         ) : (
           ""
         )}
-        <ReviewForm
-          setRating={setRating}
-          rating={rating}
-          comment={comment}
-          setComment={setComment}
-          onSubmit={onSubmit}
-          isSubmiting={isSubmiting}
-        />
       </div>
     </div>
   );

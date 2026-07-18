@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 
 const ReviewCard = ({ review }) => {
   const user = useSelector((state) => state.auth.user);
-  console.log(user);
 
   return (
     <div className="w-full flex flex-col">
