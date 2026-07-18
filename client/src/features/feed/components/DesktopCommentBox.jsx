@@ -24,21 +24,23 @@ const DesktopCommentBox = ({
             <ReviewCard key={review.id} review={review} />
           ))}
       {!isFetching && reviews.length <= 0 ? (
-        <div className="w-full flex justify-center items-center">
-          No Reviews
-        </div>
+        <>
+          <div className="w-full flex justify-center items-center">
+            No Reviews
+          </div>
+          {!hasUserReviewed && (
+            <ReviewForm
+              setRating={setRating}
+              rating={rating}
+              comment={comment}
+              setComment={setComment}
+              onSubmit={onSubmit}
+              isSubmiting={isSubmiting}
+            />
+          )}
+        </>
       ) : (
         ""
-      )}
-      {!hasUserReviewed && (
-        <ReviewForm
-          setRating={setRating}
-          rating={rating}
-          comment={comment}
-          setComment={setComment}
-          onSubmit={onSubmit}
-          isSubmiting={isSubmiting}
-        />
       )}
     </div>
   );
