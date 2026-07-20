@@ -130,6 +130,8 @@ const FeedProjectCard = ({
 
   const [reviewPost, { isLoading: isPostingReview }] = useReviewPostMutation();
 
+  const feed = useSelector((state) => state.feed.feed);
+
   const onReviewSubmit = async () => {
     try {
       const response = await reviewPost({
@@ -138,6 +140,15 @@ const FeedProjectCard = ({
         rating,
       });
       setReviews([response?.data?.review, ...reviews]);
+      console.log(response?.data?.reviewsCount);
+      dispatch(
+        setFeed(
+          feed.map((p) => {
+            if (p?.id !== project?.id) return p;
+            return { ...p, reviews_count: response?.data?.reviewsCount };
+          }),
+        ),
+      );
     } catch (error) {
       toast.error(error?.data?.error || "Failed to post the review!", {
         position: "top-center",
@@ -155,14 +166,11 @@ const FeedProjectCard = ({
   const [deleteReview, { isLoading: isDeletingReview }] =
     useDeleteReviewMutation();
 
-  const feed = useSelector((state) => state.feed.feed);
-
   async function onDeleteReview(reviewId) {
     if (!reviewId) return;
     try {
       setDeletingReviewId(reviewId);
       const response = await deleteReview(reviewId);
-      console.log("res:", response);
       setReviews((prev) => prev.filter((review) => review.id !== reviewId));
       dispatch(
         setFeed(
