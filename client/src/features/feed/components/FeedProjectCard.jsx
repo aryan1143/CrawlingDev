@@ -7,7 +7,7 @@ import {
   ThumbsUp,
   Trash2,
 } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { FaGithub, FaGlobe, FaStar } from "react-icons/fa";
 import { MdOutlineReviews } from "react-icons/md";
@@ -23,13 +23,19 @@ import { formateDateForFeed } from "../utils/formateDateForFeed";
 import DesktopCommentBox from "./DesktopCommentBox";
 import MobileCommentBox from "./MobileCommentBox";
 import {
+  useDeleteReviewMutation,
   useDislikePostMutation,
   useGetProjectReviewsQuery,
   useLazyGetProjectReviewsQuery,
   useLikePostMutation,
   useReviewPostMutation,
 } from "../../project/api/project.api";
-import { confirmLike, tempAddLike, tempRemoveLike } from "../store/feedSlice";
+import {
+  confirmLike,
+  setFeed,
+  tempAddLike,
+  tempRemoveLike,
+} from "../store/feedSlice";
 
 const techStacksColorMap = new Map(
   constants.skills.map((t) => [
@@ -54,6 +60,8 @@ const FeedProjectCard = ({
   const [comment, setComment] = useState("");
 
   const [reviews, setReviews] = useState([]);
+
+  const [deletingReviewId, setDeletingReviewId] = useState(null);
 
   const imageContainerRef = useRef(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -143,6 +151,33 @@ const FeedProjectCard = ({
   const fetchReviews = () => {
     getProjectReviews({ projectId: project.id });
   };
+
+  const [deleteReview, { isLoading: isDeletingReview }] =
+    useDeleteReviewMutation();
+
+  const feed = useSelector((state) => state.feed.feed);
+
+  async function onDeleteReview(reviewId) {
+    if (!reviewId) return;
+    try {
+      setDeletingReviewId(reviewId);
+      const response = await deleteReview(reviewId);
+      console.log("res:", response);
+      setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+      dispatch(
+        setFeed(
+          feed.map((p) => {
+            if (p?.id !== project?.id) return p;
+            return { ...p, reviews_count: response?.data?.reviewsCount };
+          }),
+        ),
+      );
+    } catch (error) {
+      toast.error("Failed to delete the review!", { position: "top-center" });
+    } finally {
+      setDeletingReviewId(null);
+    }
+  }
 
   useEffect(() => {
     if (isFetching || !data?.reviews) return;
@@ -321,6 +356,8 @@ const FeedProjectCard = ({
                 isSubmiting={isPostingReview}
                 reviews={reviews}
                 isFetching={isFetching}
+                deletingReviewId={deletingReviewId}
+                onDelete={onDeleteReview}
               />
             ) : (
               <MobileCommentBox
@@ -333,6 +370,8 @@ const FeedProjectCard = ({
                 isSubmiting={isPostingReview}
                 reviews={reviews}
                 isFetching={isFetching}
+                deletingReviewId={deletingReviewId}
+                onDelete={onDeleteReview}
               />
             ))}
         </section>

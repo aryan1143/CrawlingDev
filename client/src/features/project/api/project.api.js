@@ -39,7 +39,7 @@ export const projectApi = createApi({
     }),
     deleteReview: builder.mutation({
       query: (reviewId) => ({
-        url: `projects/reivew/${reviewId}`,
+        url: `projects/reviews/${reviewId}`,
         method: "DELETE",
       }),
     }),

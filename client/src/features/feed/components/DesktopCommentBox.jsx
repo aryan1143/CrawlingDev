@@ -13,6 +13,8 @@ const DesktopCommentBox = ({
   isSubmiting,
   reviews,
   isFetching,
+  deletingReviewId,
+  onDelete,
 }) => {
   const user = useSelector((state) => state.auth.user);
   const hasUserReviewed = reviews.find((review) => review.user_id === user.id);
@@ -21,7 +23,12 @@ const DesktopCommentBox = ({
       {isFetching
         ? [1, 2].map((e) => <ReviewCardSkeleton key={e} />)
         : reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard
+              key={review.id}
+              review={review}
+              isDeleting={deletingReviewId === review?.id}
+              onDelete={onDelete}
+            />
           ))}
       {!isFetching && reviews.length <= 0 ? (
         <>
