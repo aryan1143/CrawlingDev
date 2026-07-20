@@ -1,12 +1,20 @@
 import React from "react";
-import { FaRegStar, FaStar } from "react-icons/fa";
+import { FaEllipsisV, FaRegStar, FaStar } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import DropdownMenu from "../../../shared/ui/components/DropdownMenu";
+import { Trash2 } from "lucide-react";
 
-const ReviewCard = ({ review }) => {
+const ReviewCard = ({ review, isDeleting, onDelete }) => {
   const user = useSelector((state) => state.auth.user);
 
+  function handleOnDelete() {
+    onDelete(review?.id);
+  }
+
   return (
-    <div className="w-full flex flex-col">
+    <div
+      className={`w-full flex flex-col ${isDeleting ? "opacity-60" : "opacity-100"}`}
+    >
       <div className="w-full flex">
         <div className="relative w-full flex p-2 gap-2 items-center">
           <span className="rounded-full h-8 w-8 shrink-0">
@@ -36,6 +44,17 @@ const ReviewCard = ({ review }) => {
                     )}
                   </span>
                 ))}
+                <DropdownMenu
+                  trigger={<FaEllipsisV className="ml-5" />}
+                  options={[
+                    {
+                      label: "Delete Review",
+                      icon: <Trash2 />,
+                      danger: true,
+                      onClick: handleOnDelete,
+                    },
+                  ]}
+                />
               </div>
             </div>
             <p className="text-[0.85rem] text-card-content/70 truncate min-w-8/10 w-fit">

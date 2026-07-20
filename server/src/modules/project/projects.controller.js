@@ -505,7 +505,7 @@ export const deleteReview = async (req, res) => {
     res.status(200).json({
       message: "Review deleted successfully.",
       success: true,
-      reviewsCount: decrementReviewsResult?.row[0]?.reviews_count,
+      reviewsCount: decrementReviewsResult?.rows[0]?.reviews_count,
       data: {
         reviewId: reviewId,
         projectId: review.projectId,
