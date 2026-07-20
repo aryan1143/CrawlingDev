@@ -56,8 +56,7 @@ const ReviewForm = ({
               type="radio"
               id={`star-${star}`}
               name="rating"
-              value={star}
-              checked={rating === star}
+              defaultValue={star}
               className="hidden"
             />
             {rating >= star ? (
