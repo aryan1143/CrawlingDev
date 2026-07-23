@@ -228,13 +228,17 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
             <div className="w-full mt-3">
               <div className="flex w-full h-16 border border-gray-400/50 rounded-xl py-1.5">
                 <div className="flex flex-col justify-center items-center h-full w-1/2 border-r border-gray-400/50">
-                  <span className="text-2xl font-semibold">0</span>
+                  <span className="text-2xl font-semibold">
+                    {user?.followers_count || 0}
+                  </span>
                   <span className="text-sm -mt-1 text-card-content/70">
                     Followers
                   </span>
                 </div>
                 <div className="flex flex-col justify-center items-center h-full w-1/2">
-                  <span className="text-2xl font-semibold">0</span>
+                  <span className="text-2xl font-semibold">
+                    {user?.following_count || 0}
+                  </span>
                   <span className="text-sm -mt-1 text-card-content/70">
                     Following
                   </span>
@@ -245,9 +249,10 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
               <StatsCard
                 icon={<Star color="#f2ba2c" />}
                 title={"Avg Rating"}
-                value={`0.0`}
+                value={user?.average_rating || 0.0}
                 color={"#f2ba2c"}
               />
+              {console.log(user)}
               <StatsCard
                 icon={<Award color="#d42cf2" />}
                 title={"Reputation"}
@@ -266,7 +271,7 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
               <StatsCard
                 icon={<MessageSquareCode color="#22c73b" />}
                 title={"Reviews"}
-                value={0}
+                value={user?.reviews_count || 0}
                 color={"#22c73b"}
               />
             </div>
