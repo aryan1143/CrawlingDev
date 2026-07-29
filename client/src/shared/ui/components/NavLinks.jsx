@@ -38,9 +38,12 @@ const NavLinks = ({ isMobile = false }) => {
       </NavLink>
 
       {isMobile && (
-        <button className="flex flex-col md:flex-row justify-center items-center gap-1 py-2">
+        <NavLink
+          to={"/create"}
+          className="flex flex-col md:flex-row justify-center items-center gap-1 py-2"
+        >
           <PlusCircle className="size-10" />
-        </button>
+        </NavLink>
       )}
 
       <NavLink
