@@ -376,7 +376,7 @@ export const createReview = async (req, res) => {
     }
 
     const projectCheck = await pool.query(
-      "SELECT id FROM projects WHERE id = $1",
+      "SELECT id, created_by FROM projects WHERE id = $1",
       [projectId],
     );
     if (projectCheck.rowCount === 0) {
@@ -419,11 +419,22 @@ export const createReview = async (req, res) => {
     }
 
     const incrementReviewsResult = await pool.query(
-      `UPDATE projects 
+      `WITH updated_project AS (
+        UPDATE projects 
         SET reviews_count = reviews_count + 1 
-        WHERE id = $1 
-        RETURNING reviews_count`,
-      [projectId],
+        WHERE id = $1
+        RETURNING reviews_count
+      )
+      UPDATE users 
+      SET 
+        average_rating = CASE 
+          WHEN rating_count = 0 THEN $3::NUMERIC
+          ELSE ((average_rating * rating_count) + $3::NUMERIC) / (rating_count + 1)
+        END,
+        rating_count = rating_count + 1 
+      WHERE id = $2
+`,
+      [projectId, projectCheck.rows[0].created_by, rating],
     );
 
     const newReview = result.rows[0];
@@ -483,7 +494,7 @@ export const deleteReview = async (req, res) => {
     }
 
     const deleteResult = await pool.query(
-      "DELETE FROM reviews WHERE id = $1 RETURNING id",
+      "DELETE FROM reviews WHERE id = $1 RETURNING *",
       [reviewId],
     );
 
@@ -495,11 +506,25 @@ export const deleteReview = async (req, res) => {
     }
 
     const decrementReviewsResult = await pool.query(
-      `UPDATE projects 
+      `WITH updated_project AS (
+        UPDATE projects 
         SET reviews_count = reviews_count - 1 
-        WHERE id = $1 
-        RETURNING reviews_count`,
-      [reviewCheck.rows[0].project_id],
+        WHERE id = $1
+        RETURNING reviews_count
+      )
+      UPDATE users 
+      SET 
+        average_rating = CASE 
+          WHEN rating_count = 0 THEN 0::NUMERIC
+          ELSE ((average_rating * rating_count) - $3::NUMERIC) / (rating_count - 1)
+        END,
+        rating_count = rating_count - 1 
+      WHERE id = $2`,
+      [
+        reviewCheck.rows[0].project_id,
+        reviewCheck.rows[0].created_by,
+        deleteResult.rows[0].rating,
+      ],
     );
 
     res.status(200).json({
