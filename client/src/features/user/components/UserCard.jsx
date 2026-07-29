@@ -252,7 +252,6 @@ const UserCard = ({ user, setIsEditing, setIsEditingBanner }) => {
                 value={user?.average_rating || 0.0}
                 color={"#f2ba2c"}
               />
-              {console.log(user)}
               <StatsCard
                 icon={<Award color="#d42cf2" />}
                 title={"Reputation"}

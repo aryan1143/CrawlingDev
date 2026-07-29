@@ -15,7 +15,7 @@ const createSchema = async () => {
       linkedin VARCHAR(100),
       reputation INTEGER DEFAULT 0,
       badges TEXT[] DEFAULT ARRAY[]::TEXT[],
-      avg_rating NUMERIC(3, 2) CHECK (average_rating >= 0.00 AND average_rating <= 5.00),
+      average_rating NUMERIC(3, 2) CHECK (average_rating >= 0.00 AND average_rating <= 5.00),
       rating_count INTEGER DEFAULT 0,
       reviews_count INTEGER DEFAULT 0,
       followers_count INTEGER DEFAULT 0,
