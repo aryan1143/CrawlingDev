@@ -3,6 +3,7 @@ import {
   createReview,
   deleteReview,
   getAllMyreview,
+  getReceivedReviews,
 } from "./reviews.controller.js";
 import { requireAuth } from "../../shared/jwt.js";
 
@@ -13,6 +14,7 @@ const router = Router();
 
 router.post("/", createReview);
 router.get("/me", getAllMyreview);
+router.get("/received", requireAuth, getReceivedReviews);
 router.delete("/:reviewId", deleteReview);
 
 export default router;

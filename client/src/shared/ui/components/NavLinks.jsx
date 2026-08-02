@@ -47,7 +47,7 @@ const NavLinks = ({ isMobile = false }) => {
       )}
 
       <NavLink
-        to={"/reveiws"}
+        to={"/recievedreviews"}
         className="flex flex-col md:flex-row justify-center items-center gap-1 py-2 px-2 border-t-2 md:border-b-2 md:border-t-0 border-transparent"
       >
         <Star className="size-7 md:size-5" />

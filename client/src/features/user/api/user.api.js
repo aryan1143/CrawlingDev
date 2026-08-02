@@ -49,6 +49,13 @@ export const userApi = createApi({
         method: "DELETE",
       }),
     }),
+
+    getRecievedReviews: builder.query({
+      query: ({ order = "recent", limit = 10, offset = 0 } = {}) => ({
+        url: "reviews/received",
+        params: { order, limit, offset },
+      }),
+    }),
   }),
 });
 
@@ -59,4 +66,5 @@ export const {
   useUpdateProfilePicMutation,
   useUpdateBannerMutation,
   useDeleteAccountMutation,
+  useGetRecievedReviewsQuery,
 } = userApi;
