@@ -179,3 +179,91 @@ export const deleteReview = async (req, res) => {
     });
   }
 };
+
+/**
+ * get received reviews for a specific user with flexible ordering and pagination.
+ * @param req - Express request object
+ * @param res - Express response object
+ */
+export const getReceivedReviews = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const order = req.query.order || "recent";
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt(req.query.offset) || 0;
+
+    const validOrders = ["recent", "oldest", "top", "least"];
+    if (!validOrders.includes(order)) {
+      return res.status(400).json({
+        error: "Invalid order value. Allowed: recent, oldest, top, least",
+        success: false,
+      });
+    }
+
+    let orderByClause;
+    switch (order) {
+      case "recent":
+        orderByClause = "r.created_at DESC";
+        break;
+      case "oldest":
+        orderByClause = "r.created_at ASC";
+        break;
+      case "top":
+        orderByClause = "r.rating DESC NULLS LAST";
+        break;
+      case "least":
+        orderByClause = "r.rating ASC NULLS LAST";
+        break;
+      default:
+        orderByClause = "r.created_at DESC";
+    }
+
+    const queryText = `
+      SELECT 
+        r.id AS review_id,
+        r.comment,
+        r.rating,
+        r.helpful_votes,
+        r.created_at AS review_created_at,
+        p.id AS project_id,
+        p.title AS project_title,
+        p.images AS project_images,
+        u.id AS reviewer_id,
+        u.name AS reviewer_name,
+        u.username AS reviewer_username,
+        u.profile_pic AS reviewer_profile_pic
+      FROM reviews r
+      JOIN projects p ON r.project_id = p.id
+      JOIN users u ON r.user_id = u.id
+      WHERE p.created_by = $1
+      ORDER BY ${orderByClause}
+      LIMIT $2 OFFSET $3
+    `;
+
+    const values = [userId, limit, offset];
+    const result = await pool.query(queryText, values);
+
+    const countQuery = `
+      SELECT COUNT(*) 
+      FROM reviews r
+      JOIN projects p ON r.project_id = p.id
+      WHERE p.created_by = $1
+    `;
+    const countResult = await pool.query(countQuery, [userId]);
+    const totalCount = parseInt(countResult.rows[0].count);
+
+    res.status(200).json({
+      reviews: result.rows,
+      pagination: {
+        limit,
+        offset,
+        total: totalCount,
+        hasMore: offset + result.rows.length < totalCount,
+      },
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in getReceivedReviews controller:", error);
+    res.status(500).json({ error: "Internal server error", success: false });
+  }
+};
