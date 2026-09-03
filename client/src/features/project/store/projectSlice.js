@@ -16,6 +16,12 @@ const projectSlice = createSlice({
     setProjects(state, action) {
       state.projects = action.payload;
     },
+    appendProjects(state, action) {
+      const existingIds = new Set(state.projects.map((project) => project.id));
+      state.projects.push(
+        ...action.payload.filter((project) => !existingIds.has(project.id)),
+      );
+    },
     removeProject(state, action) {
       const projectId = action.payload;
       const updatedProjectsArr = state.projects.filter(
@@ -26,6 +32,7 @@ const projectSlice = createSlice({
   },
 });
 
-export const { setProject, setProjects, removeProject } = projectSlice.actions;
+export const { setProject, setProjects, appendProjects, removeProject } =
+  projectSlice.actions;
 
 export default projectSlice.reducer;

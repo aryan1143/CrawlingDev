@@ -203,18 +203,66 @@ export const deleteProject = async (req, res) => {
 export const getMyProjects = async (req, res) => {
   try {
     const userId = req.user.id;
+    const order = req.query.order || "recent";
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const offset = parseInt(req.query.offset, 10) || 0;
+
+    const orderBy = {
+      recent: "created_at DESC",
+      oldest: "created_at ASC",
+      popular: "likes_count DESC",
+      mostReviewed: "reviews_count DESC",
+    };
+
+    if (!Object.hasOwn(orderBy, order)) {
+      return res.status(400).json({
+        error:
+          "Invalid order value. Allowed: recent, oldest, popular, mostReviewed",
+        success: false,
+      });
+    }
+
+    if (limit < 1 || limit > 100) {
+      return res.status(400).json({
+        error: "Limit must be between 1 and 100.",
+        success: false,
+      });
+    }
+
+    if (offset < 0) {
+      return res.status(400).json({
+        error: "Offset must be a non-negative number.",
+        success: false,
+      });
+    }
+
+    const countResult = await pool.query(
+      `SELECT COUNT(*)::int AS total
+       FROM projects
+       WHERE created_by = $1`,
+      [userId],
+    );
 
     const result = await pool.query(
       `SELECT *
        FROM projects
        WHERE created_by = $1
-       ORDER BY created_at DESC`,
-      [userId],
+      ORDER BY ${orderBy[order]}
+       LIMIT $2 OFFSET $3`,
+      [userId, limit, offset],
     );
+
+    const total = countResult.rows[0].total;
 
     return res.status(200).json({
       projects: result.rows,
-      count: result.rowCount,
+      count: total,
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + limit < total,
+      },
       success: true,
     });
   } catch (error) {
