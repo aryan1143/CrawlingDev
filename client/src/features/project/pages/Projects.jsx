@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Page from "../../../shared/ui/Page";
-import Recommendetion from "../../user/components/Recommendetion";
 import useMediaQuery from "../../../shared/hooks/useMediaQuery";
 import { Filter, X } from "lucide-react";
 import { useGetMyProjectsQuery } from "../api/project.api";
@@ -9,36 +8,66 @@ import ProjectCard from "../component/ProjectCard";
 import ProjectUtils from "../component/ProjectUtils";
 import FilterModal from "../component/FilterModal";
 import Modal from "../../../shared/ui/components/Modal";
+import Spinner from "../../../shared/ui/components/Spinner";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setProjects } from "../store/projectSlice";
+import { appendProjects, setProjects } from "../store/projectSlice";
 
 const sortByOptions = [
-  { value: "latest", label: "Latest" },
+  { value: "recent", label: "Latest" },
   { value: "oldest", label: "Oldest" },
-  { value: "topRated", label: "Top Rated" },
-  { value: "leastRated", label: "Least Rated" },
+  { value: "popular", label: "Most Liked" },
+  { value: "mostReviewed", label: "Most Reviewed" },
 ];
+
+const PAGE_SIZE = 10;
 
 const Projects = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
-  const [sortBy, setSortBy] = useState("latest");
+  const [sortBy, setSortBy] = useState("recent");
+  const [offset, setOffset] = useState(0);
   const [showSortByModal, setShowSortByModal] = useState(false);
+  const projectsContainerRef = useRef(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { data, error, isLoading } = useGetMyProjectsQuery();
+  const { data, error, isLoading, isFetching } = useGetMyProjectsQuery({
+    limit: PAGE_SIZE,
+    offset,
+    order: sortBy,
+  });
+  const isSortLoading = isFetching && offset === 0;
 
   useEffect(() => {
     if (!data) return;
-    dispatch(setProjects(data.projects));
-  }, [data, isLoading]);
+    if (offset === 0) {
+      dispatch(setProjects(data.projects));
+    } else {
+      dispatch(appendProjects(data.projects));
+    }
+  }, [data, dispatch, offset]);
   const projects = useSelector((state) => state.project.projects);
-  console.log(projects);
+
+  const handleSortChange = (nextSortBy) => {
+    setOffset(0);
+    setSortBy(nextSortBy);
+  };
+
+  const handleProjectsScroll = (event) => {
+    const container = event.currentTarget;
+    const hasMore = data?.pagination?.hasMore;
+    const reachedBottom =
+      container.scrollTop + container.clientHeight >=
+      container.scrollHeight - 32;
+
+    if (reachedBottom && hasMore && !isFetching) {
+      setOffset((currentOffset) => currentOffset + PAGE_SIZE);
+    }
+  };
 
   const handleSkillToggle = (skill) => {
     setSelectedSkills((prev) =>
@@ -57,10 +86,7 @@ const Projects = () => {
   const filteredAndSortedProjects = useMemo(() => {
     if (!projects) return [];
 
-    let baseProjects = [...projects];
-    if (sortBy === "oldest") {
-      baseProjects.reverse();
-    }
+    const baseProjects = [...projects];
 
     return baseProjects.filter((project) => {
       const categoryMatch =
@@ -102,8 +128,12 @@ const Projects = () => {
           </button>
         </div>
 
-        <div className="w-full grow grid grid-cols-1 md:grid-cols-3 overflow-y-scroll scrollbar-thin gap-2 p-4 pt-2 items-stretch">
-          {isLoading
+        <div
+          ref={projectsContainerRef}
+          onScroll={handleProjectsScroll}
+          className="relative w-full grow grid grid-cols-1 md:grid-cols-3 overflow-y-scroll scrollbar-thin gap-2 p-4 pt-2 items-stretch"
+        >
+          {isLoading || isSortLoading
             ? ["", "", "", "", "", ""].map((e, i) => (
                 <ProjectCardSkeletonLoading
                   key={i}
@@ -120,6 +150,18 @@ const Projects = () => {
                   isSmall={true}
                 />
               ))}
+          {isSortLoading && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="absolute inset-0 flex items-center justify-center bg-card/70"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Spinner colorClass="border-card-content" />
+                <span>Loading projects...</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {isDesktop && (
@@ -166,7 +208,7 @@ const Projects = () => {
               name="sortBy"
               value={option.value}
               checked={sortBy === option.value}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
               className="hidden"
             />
             {option.label}

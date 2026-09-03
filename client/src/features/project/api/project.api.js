@@ -44,7 +44,10 @@ export const projectApi = createApi({
       }),
     }),
     getMyProjects: builder.query({
-      query: () => "projects/me",
+      query: ({ limit = 10, offset = 0, order = "recent" } = {}) => ({
+        url: "projects/me",
+        params: { limit, offset, order },
+      }),
     }),
     getProjectReviews: builder.query({
       query: ({ projectId, limit = 10, offset = 0 }) => ({
