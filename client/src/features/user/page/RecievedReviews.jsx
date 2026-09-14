@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageSquareQuote, X } from "lucide-react";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import Page from "../../../shared/ui/Page";
 import Modal from "../../../shared/ui/components/Modal";
 import useMediaQuery from "../../../shared/hooks/useMediaQuery";
-import { useGetRecievedReviewsQuery } from "../api/user.api";
+import { useLazyGetRecievedReviewsQuery } from "../api/user.api";
 
 const sortByOptions = [
   { value: "recent", label: "Recent" },
@@ -18,16 +18,93 @@ const RecievedReviews = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [sortBy, setSortBy] = useState("recent");
   const [showSortByModal, setShowSortByModal] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [pagination, setPagination] = useState(null);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [reviewsError, setReviewsError] = useState(null);
+  const reviewsContainerRef = useRef(null);
+  const requestVersionRef = useRef(0);
   const navigate = useNavigate();
+  const [fetchReviews] = useLazyGetRecievedReviewsQuery();
 
-  const { data, error, isLoading } = useGetRecievedReviewsQuery({
-    order: sortBy,
-    limit: 20,
-    offset: 0,
-  });
+  const pageSize = 20;
 
-  console.log("reviews data: ", data);
-  const reviews = data?.reviews ?? [];
+  useEffect(() => {
+    let isCurrentRequest = true;
+    const requestVersion = ++requestVersionRef.current;
+
+    setReviews([]);
+    setPagination(null);
+    setReviewsError(null);
+    setIsLoadingReviews(true);
+    reviewsContainerRef.current?.scrollTo({ top: 0 });
+
+    fetchReviews({ order: sortBy, limit: pageSize, offset: 0 })
+      .unwrap()
+      .then((data) => {
+        if (!isCurrentRequest || requestVersion !== requestVersionRef.current) {
+          return;
+        }
+
+        setReviews(data.reviews ?? []);
+        setPagination(data.pagination ?? null);
+      })
+      .catch((requestError) => {
+        if (isCurrentRequest && requestVersion === requestVersionRef.current) {
+          setReviewsError(requestError);
+        }
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoadingReviews(false);
+      });
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [fetchReviews, sortBy]);
+
+  const loadMoreReviews = () => {
+    if (isLoadingReviews || isLoadingMore || !pagination?.hasMore) {
+      return;
+    }
+
+    const nextOffset = pagination.offset + pagination.limit;
+    const requestVersion = requestVersionRef.current;
+    setIsLoadingMore(true);
+
+    fetchReviews({ order: sortBy, limit: pageSize, offset: nextOffset })
+      .unwrap()
+      .then((data) => {
+        if (requestVersion !== requestVersionRef.current) return;
+
+        setReviews((currentReviews) => [
+          ...currentReviews,
+          ...(data.reviews ?? []),
+        ]);
+        setPagination(data.pagination ?? null);
+      })
+      .catch((requestError) => {
+        if (requestVersion === requestVersionRef.current) {
+          setReviewsError(requestError);
+        }
+      })
+      .finally(() => {
+        if (requestVersion === requestVersionRef.current) {
+          setIsLoadingMore(false);
+        }
+      });
+  };
+
+  const handleReviewsScroll = (event) => {
+    const container = event.currentTarget;
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight <
+      160;
+
+    if (isNearBottom) loadMoreReviews();
+  };
+
   const renderStars = (rating = 0) =>
     Array.from({ length: 5 }, (_, index) => (
       <span key={index}>
@@ -126,8 +203,12 @@ const RecievedReviews = () => {
           </button>
         </div>
 
-        <div className="w-full grow overflow-y-scroll scrollbar-thin p-4 pt-3">
-          {isLoading ? (
+        <div
+          ref={reviewsContainerRef}
+          onScroll={handleReviewsScroll}
+          className="w-full grow overflow-y-scroll scrollbar-thin p-4 pt-3"
+        >
+          {isLoadingReviews ? (
             <div className="grid gap-4 md:grid-cols-2">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
@@ -136,7 +217,7 @@ const RecievedReviews = () => {
                 />
               ))}
             </div>
-          ) : error ? (
+          ) : reviewsError ? (
             <div className="flex h-full items-center justify-center rounded-xl border border-red-400/30 bg-red-500/10 p-6 text-center text-error/70 text-2xl font-semibold text-balance">
               Unable to load received reviews right now.
             </div>
@@ -145,34 +226,43 @@ const RecievedReviews = () => {
               No reviews have been received yet.
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {reviews.map(renderReviewCard)}
-            </div>
+            <>
+              <div className="grid gap-4 md:grid-cols-2">
+                {reviews.map(renderReviewCard)}
+              </div>
+              {isLoadingMore && (
+                <div className="py-4 text-center text-sm text-card-content/70">
+                  Loading more reviews...
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
 
       {isDesktop && (
-        <aside className="hidden md:flex md:w-28/100 flex-col gap-4 rounded-xl border border-card-content/15 bg-card p-4 shadow-sm">
+        <aside className="hidden md:flex md:w-28/100 flex-col gap-4 rounded-xl border border-card-content/15 bg-card p-4 shadow-sm h-fit min-h-8/10">
           <div>
             <h2 className="text-lg font-semibold">Sort Reviews</h2>
             <p className="text-sm text-card-content/70">
               Choose how your received feedback is ordered.
             </p>
           </div>
-          <div className="flex flex-col gap-2">
+          <form className="w-full h-fit flex flex-wrap gap-2 p-3 pt-0 mt-2 border-2 border-card-content/30 rounded-2xl">
+            <span className="w-full p-2 text-xl font-semibold">Sort By</span>
+
             {sortByOptions.map((option) => (
               <label
                 key={option.value}
-                className={`cursor-pointer rounded-full px-4 py-2 text-sm transition-colors ${
+                className={`cursor-pointer px-5 py-1 rounded-full transition-colors ${
                   sortBy === option.value
                     ? "bg-btn text-btn-text"
-                    : "bg-background/80 hover:bg-background"
+                    : "bg-card-content/10 hover:bg-card-content/20"
                 }`}
               >
                 <input
                   type="radio"
-                  name="reviewSortBy"
+                  name="sortBy"
                   value={option.value}
                   checked={sortBy === option.value}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -181,7 +271,7 @@ const RecievedReviews = () => {
                 {option.label}
               </label>
             ))}
-          </div>
+          </form>
         </aside>
       )}
 
@@ -205,7 +295,10 @@ const RecievedReviews = () => {
               name="reviewSortByMobile"
               value={option.value}
               checked={sortBy === option.value}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setShowSortByModal(false);
+              }}
               className="hidden"
             />
             {option.label}

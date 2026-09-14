@@ -96,19 +96,51 @@ export const createReview = async (req, res) => {
 export const getAllMyreview = async (req, res) => {
   try {
     const userId = req.user.id;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const offset = parseInt(req.query.offset, 10) || 0;
+
+    if (limit < 1 || limit > 100) {
+      return res.status(400).json({
+        error: "Limit must be between 1 and 100.",
+        success: false,
+      });
+    }
+
+    if (offset < 0) {
+      return res.status(400).json({
+        error: "Offset must be a non-negative number.",
+        success: false,
+      });
+    }
 
     const result = await pool.query(
       `SELECT reviews.*, projects.title AS project_title, projects.category, projects.images
 			 FROM reviews
 			 JOIN projects ON projects.id = reviews.project_id
 			 WHERE reviews.user_id = $1
-			 ORDER BY reviews.created_at DESC`,
+             ORDER BY reviews.created_at DESC
+             LIMIT $2 OFFSET $3`,
+      [userId, limit, offset],
+    );
+
+    const countResult = await pool.query(
+      `SELECT COUNT(*)::int AS total
+       FROM reviews
+       WHERE user_id = $1`,
       [userId],
     );
 
+    const total = countResult.rows[0].total;
+
     return res.status(200).json({
       reviews: result.rows,
-      count: result.rowCount,
+      count: total,
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + result.rows.length < total,
+      },
       success: true,
     });
   } catch (error) {
