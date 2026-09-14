@@ -67,4 +67,5 @@ export const {
   useUpdateBannerMutation,
   useDeleteAccountMutation,
   useGetRecievedReviewsQuery,
+  useLazyGetRecievedReviewsQuery,
 } = userApi;
