@@ -11,7 +11,13 @@ export const feedApi = createApi({
         params: { limit, page },
       }),
     }),
+    searchProjects: builder.query({
+      query: ({ q, page = 1, limit = 6 }) => ({
+        url: "feed/search",
+        params: { q, page, limit },
+      }),
+    }),
   }),
 });
 
-export const { useGetMyfeedQuery } = feedApi;
+export const { useGetMyfeedQuery, useLazySearchProjectsQuery } = feedApi;
